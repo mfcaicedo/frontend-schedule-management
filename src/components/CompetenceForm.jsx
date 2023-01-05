@@ -18,6 +18,7 @@ function CompetenceForm(){
     useEffect(() => {
         console.log("hola");
         loadCompetence();
+        console.log("mirar este", competence)
     }, []);
 
 
