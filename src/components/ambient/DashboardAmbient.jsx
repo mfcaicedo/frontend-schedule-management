@@ -346,6 +346,7 @@ function DashboardAmbient() {
                         className={classNames({ 'p-invalid': submitted && !product.name })} />
                     {submitted && !product.name && <small className="p-error">Name is required.</small>}
                 </div>
+
                 <div className="field">
                     <label htmlFor="type">Tipo</label>
                     <Dropdown
