@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import { classNames } from 'primereact/utils';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-// import { ProductService } from '../service/ProductService';
 import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
 import { FileUpload } from 'primereact/fileupload';
@@ -39,20 +38,22 @@ function DashboardAmbient() {
 
 
 
-    const loadCompetence = () => {
-        let baseUrl = "http://localhost:8080/competence";
+    const loadAmbient = () => {
+        let baseUrl = "http://localhost:8080/ambient";
         axios.get(baseUrl).then(response =>
             // setCompetence(response.data)
             setProducts(response.data)
         );
     };
 
-    let emptyCompetence = {
+    let emptyAmbient = {
         id: null,
         name: '',
-        type: '',
+        location: '',
+        typeEnvironment: '',
+        ability: '',
         state: '',
-        program: null,
+        schedule: null,
     };
 
     const typeOptions = [
@@ -67,7 +68,7 @@ function DashboardAmbient() {
     ];
 
     useEffect(() => {
-        loadCompetence();
+        loadAmbient();
         console.log("competence", competence)
         console.log("producr", product)
 
@@ -81,7 +82,7 @@ function DashboardAmbient() {
     console.log("products", product);
 
     const openNew = () => {
-        setProduct(emptyCompetence);
+        setProduct(emptyAmbient);
         setSubmitted(false);
         setProductDialog(true);
     }
@@ -120,7 +121,7 @@ function DashboardAmbient() {
 
             setProducts(_products);
             setProductDialog(false);
-            setProduct(emptyCompetence);
+            setProduct(emptyAmbient);
         }
     }
 
@@ -138,7 +139,7 @@ function DashboardAmbient() {
         let _products = products.filter(val => val.id !== product.id);
         setProducts(_products);
         setDeleteProductDialog(false);
-        setProduct(emptyCompetence);
+        setProduct(emptyAmbient);
         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 3000 });
     }
 
@@ -318,9 +319,11 @@ function DashboardAmbient() {
                     <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} exportable={false}></Column>
                     <Column field="id" header="Id" style={{ minWidth: '12rem' }}></Column>
                     <Column field="name" header="Nombre" sortable style={{ minWidth: '16rem' }}></Column>
-                    <Column field="type" header="Tipo" ></Column>
-                    <Column field="state" header="Estado" style={{ minWidth: '8rem' }}></Column>
-                    <Column field="program" header="Programa" sortable style={{ minWidth: '10rem' }}></Column>
+                    <Column field="location" header="Ubicación" ></Column>
+                    <Column field="typeEnvironment" header="Tipo de ambiente" ></Column>
+                    <Column field="state" header="Estado" ></Column>
+                    {/* //<Column field="state" header="Estado" style={{ minWidth: '8rem' }}></Column> */}
+                    <Column field="schedule" header="Schedule" sortable style={{ minWidth: '10rem' }}></Column>
                     {/* <Column field="rating" header="Reviews" body={ratingBodyTemplate} sortable style={{ minWidth: '12rem' }}></Column> */}
                     {/* <Column field="inventoryStatus" header="Status" body={statusBodyTemplate} sortable style={{ minWidth: '12rem' }}></Column> */}
                     <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '8rem' }}></Column>
@@ -346,7 +349,6 @@ function DashboardAmbient() {
                         className={classNames({ 'p-invalid': submitted && !product.name })} />
                     {submitted && !product.name && <small className="p-error">Name is required.</small>}
                 </div>
-
                 <div className="field">
                     <label htmlFor="type">Tipo</label>
                     <Dropdown
