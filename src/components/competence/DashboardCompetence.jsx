@@ -347,7 +347,7 @@ function DashboardCompetence() {
                     {submitted && !product.name && <small className="p-error">Name is required.</small>}
                 </div>
                 <div className="field">
-                    <label htmlFor="description">Tipo</label>
+                    <label htmlFor="type">Tipo</label>
                     <Dropdown 
                     style={{
                         borderBlockColor: "#5EB319",
@@ -355,6 +355,7 @@ function DashboardCompetence() {
                         borderColor: "#5EB319",
 
                     }}
+                    name="type"
                     value={selectType} 
                     options={typeOptions} 
                     onChange={(e) => setSelectType(e.value)} 

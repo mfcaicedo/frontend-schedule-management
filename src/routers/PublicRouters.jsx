@@ -11,7 +11,7 @@ function PublicRouters() {
         <>
             <Navbar />
             <Routes>
-                <Route path="/" element={<Navbar />} />
+                {/* <Route path="/" element={<Navbar />} /> */}
                 <Route path="/competence" element={<CompetenceForm />} />
                 <Route path="/view-competence/" element={<DashboardCompetence />} />
             </Routes>
