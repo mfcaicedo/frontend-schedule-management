@@ -106,6 +106,22 @@ function Navbar() {
         {
             label: 'Periodo académico',
             icon: 'pi pi-clock',
+            items: [
+                {
+                    label: 'Crear',
+                    icon: 'pi pi-plus-circle',
+                    command: () => {
+                        window.location = "/academicPeriod"
+                    }
+                },
+                {
+                    label: 'Ver',
+                    icon: 'pi pi-eye',
+                    command: () => {
+                        window.location = "/view-academicPeriod"
+                    }
+                },
+            ]
         },
         {
             label: 'Docente',
