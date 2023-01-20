@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import { classNames } from 'primereact/utils';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-// import { ProductService } from '../service/ProductService';
 import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
 import { FileUpload } from 'primereact/fileupload';
@@ -39,7 +38,7 @@ function DashboardProgram() {
 
 
 
-    const loadCompetence = () => {
+    const loadProgram = () => {
         let baseUrl = "http://localhost:8080/program";
         axios.get(baseUrl).then(response =>
             // setCompetence(response.data)
@@ -47,12 +46,11 @@ function DashboardProgram() {
         );
     };
 
-    let emptyCompetence = {
+    let emptyProgram = {
         id: null,
+        code: '',
         name: '',
-        type: '',
-        state: '',
-        program: null,
+        academic_period: null,
     };
 
     const typeOptions = [
@@ -67,7 +65,7 @@ function DashboardProgram() {
     ];
 
     useEffect(() => {
-        loadCompetence();
+        loadProgram();
         console.log("competence", competence)
         console.log("producr", product)
 
@@ -81,7 +79,7 @@ function DashboardProgram() {
     console.log("products", product);
 
     const openNew = () => {
-        setProduct(emptyCompetence);
+        setProduct(emptyProgram);
         setSubmitted(false);
         setProductDialog(true);
     }
@@ -120,7 +118,7 @@ function DashboardProgram() {
 
             setProducts(_products);
             setProductDialog(false);
-            setProduct(emptyCompetence);
+            setProduct(emptyProgram);
         }
     }
 
@@ -138,7 +136,7 @@ function DashboardProgram() {
         let _products = products.filter(val => val.id !== product.id);
         setProducts(_products);
         setDeleteProductDialog(false);
-        setProduct(emptyCompetence);
+        setProduct(emptyProgram);
         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 3000 });
     }
 
@@ -317,12 +315,9 @@ function DashboardProgram() {
                     globalFilter={globalFilter} header={header} responsiveLayout="scroll">
                     <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} exportable={false}></Column>
                     <Column field="id" header="Id" style={{ minWidth: '12rem' }}></Column>
-                    <Column field="name" header="Nombre" sortable style={{ minWidth: '16rem' }}></Column>
-                    <Column field="type" header="Tipo" ></Column>
-                    <Column field="state" header="Estado" style={{ minWidth: '8rem' }}></Column>
-                    <Column field="program" header="Programa" sortable style={{ minWidth: '10rem' }}></Column>
-                    {/* <Column field="rating" header="Reviews" body={ratingBodyTemplate} sortable style={{ minWidth: '12rem' }}></Column> */}
-                    {/* <Column field="inventoryStatus" header="Status" body={statusBodyTemplate} sortable style={{ minWidth: '12rem' }}></Column> */}
+                    <Column field="code" header="Código" style={{ minWidth: '16rem' }}></Column>
+                    <Column field="name" header="Nombre" ></Column>
+                    <Column field="academic_period" header="Periodo Académico" ></Column>
                     <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '8rem' }}></Column>
                 </DataTable>
             </div>
@@ -332,12 +327,12 @@ function DashboardProgram() {
                 modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
                 <div className="title-form" style={{ color: "#5EB319", fontWeight: "bold", fontSize: "22px" }}>
                     <p style={{ marginTop: "0px" }}>
-                        Crear competencia
+                        Crear Programa
                     </p>
                 </div>
                 <div className="field">
 
-                    <label htmlFor="name">Nombre</label>
+                    <label htmlFor="name">Código</label>
                     <InputText
                         id="name"
                         value={product.name}
@@ -347,7 +342,17 @@ function DashboardProgram() {
                     {submitted && !product.name && <small className="p-error">Name is required.</small>}
                 </div>
                 <div className="field">
-                    <label htmlFor="type">Tipo</label>
+                    <label htmlFor="type">Nombre</label>
+                    <InputText
+                        id="name"
+                        value={product.name}
+                        onChange={(e) => onInputChange(e, 'name')}
+                        required autoFocus
+                        className={classNames({ 'p-invalid': submitted && !product.name })} />
+                    {submitted && !product.name && <small className="p-error">Name is required.</small>}
+                </div>
+                <div className="field">
+                    <label htmlFor="type">Periodo Académico</label>
                     <Dropdown
                         style={{
                             borderBlockColor: "#5EB319",
@@ -362,39 +367,6 @@ function DashboardProgram() {
                         optionLabel="label"
                         placeholder="Seleccione tipo"
                     />
-                </div>
-
-                <div className="field">
-                    <label className="mb-3">Category</label>
-                    <div className="formgrid grid">
-                        <div className="field-radiobutton col-6">
-                            <RadioButton inputId="category1" name="category" value="Accessories" onChange={onCategoryChange} checked={product.category === 'Accessories'} />
-                            <label htmlFor="category1">Accessories</label>
-                        </div>
-                        <div className="field-radiobutton col-6">
-                            <RadioButton inputId="category2" name="category" value="Clothing" onChange={onCategoryChange} checked={product.category === 'Clothing'} />
-                            <label htmlFor="category2">Clothing</label>
-                        </div>
-                        <div className="field-radiobutton col-6">
-                            <RadioButton inputId="category3" name="category" value="Electronics" onChange={onCategoryChange} checked={product.category === 'Electronics'} />
-                            <label htmlFor="category3">Electronics</label>
-                        </div>
-                        <div className="field-radiobutton col-6">
-                            <RadioButton inputId="category4" name="category" value="Fitness" onChange={onCategoryChange} checked={product.category === 'Fitness'} />
-                            <label htmlFor="category4">Fitness</label>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="formgrid grid">
-                    <div className="field col">
-                        <label htmlFor="price">Price</label>
-                        <InputNumber id="price" value={product.price} onValueChange={(e) => onInputNumberChange(e, 'price')} mode="currency" currency="USD" locale="en-US" />
-                    </div>
-                    <div className="field col">
-                        <label htmlFor="quantity">Quantity</label>
-                        <InputNumber id="quantity" value={product.quantity} onValueChange={(e) => onInputNumberChange(e, 'quantity')} integeronly />
-                    </div>
                 </div>
             </Dialog>
 
