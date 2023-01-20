@@ -4,6 +4,7 @@ import Navbar from "../components/Navbar";
 import CompetenceForm from "../components/CompetenceForm";
 import DashboardCompetence from "../components/competence/DashboardCompetence";
 import DashboardAmbient from "../components/ambient/DashboardAmbient";
+import DashboardAcademicPeriod from "../components/AcademicPeriod/DashboardAcademicPeriod";
 import '../App.css';
 
 function PublicRouters() {
@@ -16,6 +17,7 @@ function PublicRouters() {
                 <Route path="/competence" element={<CompetenceForm />} />
                 <Route path="/view-competence/" element={<DashboardCompetence />} />
                 <Route path="/view-ambient/" element={<DashboardAmbient />} />
+                <Route path="/view-academicPeriod/" element={<DashboardAcademicPeriod />} />
             </Routes>
         </>
     )
