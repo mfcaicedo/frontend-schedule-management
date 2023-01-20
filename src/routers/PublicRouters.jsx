@@ -17,6 +17,7 @@ function PublicRouters() {
                 <Route path="/competence" element={<CompetenceForm />} />
                 <Route path="/view-competence/" element={<DashboardCompetence />} />
                 <Route path="/view-ambient/" element={<DashboardAmbient />} />
+                <Route path="/view-program/" element={<DashboardProgram />} />
                 <Route path="/view-academicPeriod/" element={<DashboardAcademicPeriod />} />
             </Routes>
         </>

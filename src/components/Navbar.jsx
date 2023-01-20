@@ -58,28 +58,31 @@ function Navbar() {
                 {
                     label: 'Ver',
                     icon: 'pi pi-eye',
+                    command: () => {
+                        window.location = "/view-program"
+                    }
 
                 },
-                {
-                    label: 'Search',
-                    icon: 'pi pi-fw pi-users',
-                    items: [
-                        {
-                            label: 'Filter',
-                            icon: 'pi pi-fw pi-filter',
-                            items: [
-                                {
-                                    label: 'Print',
-                                    icon: 'pi pi-fw pi-print'
-                                }
-                            ]
-                        },
-                        {
-                            icon: 'pi pi-fw pi-bars',
-                            label: 'List'
-                        }
-                    ]
-                }
+                // {
+                //     label: 'Search',
+                //     icon: 'pi pi-fw pi-users',
+                //     items: [
+                //         {
+                //             label: 'Filter',
+                //             icon: 'pi pi-fw pi-filter',
+                //             items: [
+                //                 {
+                //                     label: 'Print',
+                //                     icon: 'pi pi-fw pi-print'
+                //                 }
+                //             ]
+                //         },
+                //         {
+                //             icon: 'pi pi-fw pi-bars',
+                //             label: 'List'
+                //         }
+                //     ]
+                // }
             ]
         },
         {
