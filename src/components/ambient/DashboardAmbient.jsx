@@ -318,14 +318,12 @@ function DashboardAmbient() {
                     globalFilter={globalFilter} header={header} responsiveLayout="scroll">
                     <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} exportable={false}></Column>
                     <Column field="id" header="Id" style={{ minWidth: '12rem' }}></Column>
-                    <Column field="name" header="Nombre" sortable style={{ minWidth: '16rem' }}></Column>
+                    <Column field="name" header="Nombre" style={{ minWidth: '16rem' }}></Column>
                     <Column field="location" header="Ubicación" ></Column>
                     <Column field="typeEnvironment" header="Tipo de ambiente" ></Column>
                     <Column field="state" header="Estado" ></Column>
                     {/* //<Column field="state" header="Estado" style={{ minWidth: '8rem' }}></Column> */}
                     <Column field="schedule" header="Schedule" sortable style={{ minWidth: '10rem' }}></Column>
-                    {/* <Column field="rating" header="Reviews" body={ratingBodyTemplate} sortable style={{ minWidth: '12rem' }}></Column> */}
-                    {/* <Column field="inventoryStatus" header="Status" body={statusBodyTemplate} sortable style={{ minWidth: '12rem' }}></Column> */}
                     <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '8rem' }}></Column>
                 </DataTable>
             </div>
@@ -335,7 +333,7 @@ function DashboardAmbient() {
                 modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
                 <div className="title-form" style={{ color: "#5EB319", fontWeight: "bold", fontSize: "22px" }}>
                     <p style={{ marginTop: "0px" }}>
-                        Crear competencia
+                        Crear Ambiente
                     </p>
                 </div>
                 <div className="field">
@@ -350,7 +348,17 @@ function DashboardAmbient() {
                     {submitted && !product.name && <small className="p-error">Name is required.</small>}
                 </div>
                 <div className="field">
-                    <label htmlFor="type">Tipo</label>
+                    <label htmlFor="type">Ubicación</label>
+                    <InputText
+                        id="name"
+                        value={product.name}
+                        onChange={(e) => onInputChange(e, 'name')}
+                        required autoFocus
+                        className={classNames({ 'p-invalid': submitted && !product.name })} />
+                    {submitted && !product.name && <small className="p-error">Name is required.</small>}
+                </div>
+                <div className="field">
+                    <label htmlFor="type">Tipo de ambiente</label>
                     <Dropdown
                         style={{
                             borderBlockColor: "#5EB319",
@@ -365,39 +373,6 @@ function DashboardAmbient() {
                         optionLabel="label"
                         placeholder="Seleccione tipo"
                     />
-                </div>
-
-                <div className="field">
-                    <label className="mb-3">Category</label>
-                    <div className="formgrid grid">
-                        <div className="field-radiobutton col-6">
-                            <RadioButton inputId="category1" name="category" value="Accessories" onChange={onCategoryChange} checked={product.category === 'Accessories'} />
-                            <label htmlFor="category1">Accessories</label>
-                        </div>
-                        <div className="field-radiobutton col-6">
-                            <RadioButton inputId="category2" name="category" value="Clothing" onChange={onCategoryChange} checked={product.category === 'Clothing'} />
-                            <label htmlFor="category2">Clothing</label>
-                        </div>
-                        <div className="field-radiobutton col-6">
-                            <RadioButton inputId="category3" name="category" value="Electronics" onChange={onCategoryChange} checked={product.category === 'Electronics'} />
-                            <label htmlFor="category3">Electronics</label>
-                        </div>
-                        <div className="field-radiobutton col-6">
-                            <RadioButton inputId="category4" name="category" value="Fitness" onChange={onCategoryChange} checked={product.category === 'Fitness'} />
-                            <label htmlFor="category4">Fitness</label>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="formgrid grid">
-                    <div className="field col">
-                        <label htmlFor="price">Price</label>
-                        <InputNumber id="price" value={product.price} onValueChange={(e) => onInputNumberChange(e, 'price')} mode="currency" currency="USD" locale="en-US" />
-                    </div>
-                    <div className="field col">
-                        <label htmlFor="quantity">Quantity</label>
-                        <InputNumber id="quantity" value={product.quantity} onValueChange={(e) => onInputNumberChange(e, 'quantity')} integeronly />
-                    </div>
                 </div>
             </Dialog>
 
