@@ -6,15 +6,11 @@ import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
 import { FileUpload } from 'primereact/fileupload';
-import { Rating } from 'primereact/rating';
 import { Toolbar } from 'primereact/toolbar';
-import { InputTextarea } from 'primereact/inputtextarea';
-import { RadioButton } from 'primereact/radiobutton';
 import { InputNumber } from 'primereact/inputnumber';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
-import { CascadeSelect } from 'primereact/cascadeselect';
-import { Dropdown } from 'primereact/dropdown';
+import { Calendar } from 'primereact/calendar';
 import logo from '../../assets/img/logo.png';
 import '../../App.css';
 
@@ -22,7 +18,6 @@ import axios from "axios";
 
 function DashboardAcademicPeriod() {
 
-    const [competence, setCompetence] = useState([]);
     const [products, setProducts] = useState(null);
     const [productDialog, setProductDialog] = useState(false);
     const [deleteProductDialog, setDeleteProductDialog] = useState(false);
@@ -32,6 +27,10 @@ function DashboardAcademicPeriod() {
     const [submitted, setSubmitted] = useState(false);
     const [globalFilter, setGlobalFilter] = useState(null);
     const [selectType, setSelectType] = useState(null);
+    //calendario
+    const [fechaInicio, setFechaInicio] = useState(null);
+    const [fechaFinalizacion, setFechaFinalizacion] = useState(null);
+
 
     //Referencias 
     const toast = useRef(null);
@@ -39,49 +38,30 @@ function DashboardAcademicPeriod() {
 
 
 
-    const loadCompetence = () => {
+    const loadAcademicPeriod = () => {
         let baseUrl = "http://localhost:8080/academicPeriod";
         axios.get(baseUrl).then(response =>
-            // setCompetence(response.data)
             setProducts(response.data)
         );
     };
 
-    let emptyCompetence = {
+    let emptyAcademicPeriod = {
         id: null,
         name: '',
-        type: '',
-        state: '',
-        program: null,
+        date_init: '',
+        date_end: '',
+        //program: null,
     };
 
-    const typeOptions = [
-        {
-            label: 'Genérica',
-            input: 'Generica'
-        },
-        {
-            label: 'Específica',
-            input: 'Especifica'
-        }
-    ];
 
     useEffect(() => {
-        loadCompetence();
-        console.log("competence", competence)
+        loadAcademicPeriod();
         console.log("producr", product)
 
     }, []);
 
-
-    const formatCurrency = (value) => {
-        return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-    }
-
-    console.log("products", product);
-
     const openNew = () => {
-        setProduct(emptyCompetence);
+        setProduct(emptyAcademicPeriod);
         setSubmitted(false);
         setProductDialog(true);
     }
@@ -120,7 +100,7 @@ function DashboardAcademicPeriod() {
 
             setProducts(_products);
             setProductDialog(false);
-            setProduct(emptyCompetence);
+            setProduct(emptyAcademicPeriod);
         }
     }
 
@@ -138,7 +118,7 @@ function DashboardAcademicPeriod() {
         let _products = products.filter(val => val.id !== product.id);
         setProducts(_products);
         setDeleteProductDialog(false);
-        setProduct(emptyCompetence);
+        setProduct(emptyAcademicPeriod);
         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 3000 });
     }
 
@@ -236,8 +216,8 @@ function DashboardAcademicPeriod() {
     const leftToolbarTemplate = () => {
         return (
             <React.Fragment>
-                <Button label="New" icon="pi pi-plus" className="p-button-success mr-2" onClick={openNew} />
-                <Button label="Delete" icon="pi pi-trash" className="p-button-danger" onClick={confirmDeleteSelected} disabled={!selectedProducts || !selectedProducts.length} />
+                <Button label="Nuevo" icon="pi pi-plus" className="p-button-success mr-2" onClick={openNew} />
+                {/* <Button label="Delete" icon="pi pi-trash" className="p-button-danger" onClick={confirmDeleteSelected} disabled={!selectedProducts || !selectedProducts.length} /> */}
             </React.Fragment>
         )
     }
@@ -245,50 +225,35 @@ function DashboardAcademicPeriod() {
     const rightToolbarTemplate = () => {
         return (
             <React.Fragment>
-                <FileUpload mode="basic" name="demo[]" auto url="https://primefaces.org/primereact/showcase/upload.php" accept=".csv" chooseLabel="Import" className="mr-2 inline-block" onUpload={importCSV} />
-                <Button label="Export" icon="pi pi-upload" className="p-button-help" onClick={exportCSV} />
+                {/* <FileUpload mode="basic" name="demo[]" auto url="https://primefaces.org/primereact/showcase/upload.php" accept=".csv" chooseLabel="Import" className="mr-2 inline-block" onUpload={importCSV} />
+                <Button label="Export" icon="pi pi-upload" className="p-button-help" onClick={exportCSV} /> */}
             </React.Fragment>
         )
-    }
-
-    const imageBodyTemplate = (rowData) => {
-        return <img src={`images/product/${rowData.image}`} onError={(e) => e.target.src = 'https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png'} alt={rowData.image} className="product-image" />
-    }
-
-    const priceBodyTemplate = (rowData) => {
-        return formatCurrency(rowData.price);
-    }
-
-    const ratingBodyTemplate = (rowData) => {
-        return <Rating value={rowData.rating} readOnly cancel={false} />;
-    }
-
-    const statusBodyTemplate = (rowData) => {
-        return <span className={`product-badge status-${rowData.inventoryStatus.toLowerCase()}`}>{rowData.inventoryStatus}</span>;
     }
 
     const actionBodyTemplate = (rowData) => {
         return (
             <React.Fragment>
                 <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editProduct(rowData)} />
-                <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDeleteProduct(rowData)} />
+                {/* <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDeleteProduct(rowData)} /> */}
+                <Button label="Programas asociados"/>
             </React.Fragment>
         );
     }
 
     const header = (
         <div className="table-header">
-            <h5 className="mx-0 my-1">Manage Products</h5>
+            <h5 className="mx-0 my-1">Periodos Académicos</h5>
             <span className="p-input-icon-left">
                 <i className="pi pi-search" />
-                <InputText type="search" onInput={(e) => setGlobalFilter(e.target.value)} placeholder="Search..." />
+                <InputText type="search" onInput={(e) => setGlobalFilter(e.target.value)} placeholder="Buscar..." />
             </span>
         </div>
     );
     const productDialogFooter = (
         <React.Fragment>
-            <Button label="Cancel" icon="pi pi-times" className="p-button-text" onClick={hideDialog} />
-            <Button label="Save" icon="pi pi-check" className="p-button-text" onClick={saveProduct} />
+            <Button label="Cancelar" icon="pi pi-times" className="p-button-text" style= {{color: "gray"}} onClick={hideDialog} />
+            <Button label="Guardar" icon="pi pi-check" className="p-button-text" style= {{color: "#5EB319"}} onClick={saveProduct} />
         </React.Fragment>
     );
     const deleteProductDialogFooter = (
@@ -313,14 +278,13 @@ function DashboardAcademicPeriod() {
                 <DataTable ref={dt} value={products} selection={selectedProducts} onSelectionChange={(e) => setSelectedProducts(e.value)}
                     dataKey="id" paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
+                    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} periodos académicos"
                     globalFilter={globalFilter} header={header} responsiveLayout="scroll">
                     <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} exportable={false}></Column>
                     <Column field="id" header="Id" style={{ minWidth: '12rem' }}></Column>
                     <Column field="name" header="Nombre" sortable style={{ minWidth: '16rem' }}></Column>
                     <Column field="date_init" header="Fecha de inicio" ></Column>
                     <Column field="date_end" header="Fecha de finalización" style={{ minWidth: '8rem' }}></Column>
-                    <Column field="program" header="Programa" sortable style={{ minWidth: '10rem' }}></Column>
                     {/* <Column field="rating" header="Reviews" body={ratingBodyTemplate} sortable style={{ minWidth: '12rem' }}></Column> */}
                     {/* <Column field="inventoryStatus" header="Status" body={statusBodyTemplate} sortable style={{ minWidth: '12rem' }}></Column> */}
                     <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '8rem' }}></Column>
@@ -332,11 +296,10 @@ function DashboardAcademicPeriod() {
                 modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
                 <div className="title-form" style={{ color: "#5EB319", fontWeight: "bold", fontSize: "22px" }}>
                     <p style={{ marginTop: "0px" }}>
-                        Crear competencia
+                        Crear Periodo Académico
                     </p>
                 </div>
                 <div className="field">
-
                     <label htmlFor="name">Nombre</label>
                     <InputText
                         id="name"
@@ -346,56 +309,17 @@ function DashboardAcademicPeriod() {
                         className={classNames({ 'p-invalid': submitted && !product.name })} />
                     {submitted && !product.name && <small className="p-error">Name is required.</small>}
                 </div>
+                
                 <div className="field">
-                    <label htmlFor="type">Tipo</label>
-                    <Dropdown 
-                    style={{
-                        borderBlockColor: "#5EB319",
-                        boxShadow: "0px 0px 0px 0.2px #5EB319",
-                        borderColor: "#5EB319",
-
-                    }}
-                    name="type"
-                    value={selectType} 
-                    options={typeOptions} 
-                    onChange={(e) => setSelectType(e.value)} 
-                    optionLabel="label" 
-                    placeholder="Seleccione tipo" 
-                    />
+                    <label htmlFor="basic">Fecha de Inicio</label>
+                    <Calendar id="basic" value={fechaInicio} onChange={(e) => setFechaInicio(e.value)} dateFormat="dd-mm-yy" />
                 </div>
 
                 <div className="field">
-                    <label className="mb-3">Category</label>
-                    <div className="formgrid grid">
-                        <div className="field-radiobutton col-6">
-                            <RadioButton inputId="category1" name="category" value="Accessories" onChange={onCategoryChange} checked={product.category === 'Accessories'} />
-                            <label htmlFor="category1">Accessories</label>
-                        </div>
-                        <div className="field-radiobutton col-6">
-                            <RadioButton inputId="category2" name="category" value="Clothing" onChange={onCategoryChange} checked={product.category === 'Clothing'} />
-                            <label htmlFor="category2">Clothing</label>
-                        </div>
-                        <div className="field-radiobutton col-6">
-                            <RadioButton inputId="category3" name="category" value="Electronics" onChange={onCategoryChange} checked={product.category === 'Electronics'} />
-                            <label htmlFor="category3">Electronics</label>
-                        </div>
-                        <div className="field-radiobutton col-6">
-                            <RadioButton inputId="category4" name="category" value="Fitness" onChange={onCategoryChange} checked={product.category === 'Fitness'} />
-                            <label htmlFor="category4">Fitness</label>
-                        </div>
-                    </div>
+                    <label htmlFor="basic">Fecha de Finalización</label>
+                    <Calendar id="basic" value={fechaFinalizacion} onChange={(e) => setFechaFinalizacion(e.value)} dateFormat="dd-mm-yy" />
                 </div>
 
-                <div className="formgrid grid">
-                    <div className="field col">
-                        <label htmlFor="price">Price</label>
-                        <InputNumber id="price" value={product.price} onValueChange={(e) => onInputNumberChange(e, 'price')} mode="currency" currency="USD" locale="en-US" />
-                    </div>
-                    <div className="field col">
-                        <label htmlFor="quantity">Quantity</label>
-                        <InputNumber id="quantity" value={product.quantity} onValueChange={(e) => onInputNumberChange(e, 'quantity')} integeronly />
-                    </div>
-                </div>
             </Dialog>
 
             <Dialog visible={deleteProductDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductDialogFooter} onHide={hideDeleteProductDialog}>

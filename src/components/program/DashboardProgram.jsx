@@ -7,12 +7,8 @@ import { Button } from 'primereact/button';
 import { FileUpload } from 'primereact/fileupload';
 import { Rating } from 'primereact/rating';
 import { Toolbar } from 'primereact/toolbar';
-import { InputTextarea } from 'primereact/inputtextarea';
-import { RadioButton } from 'primereact/radiobutton';
-import { InputNumber } from 'primereact/inputnumber';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
-import { CascadeSelect } from 'primereact/cascadeselect';
 import { Dropdown } from 'primereact/dropdown';
 import logo from '../../assets/img/logo.png';
 import '../../App.css';
@@ -234,8 +230,8 @@ function DashboardProgram() {
     const leftToolbarTemplate = () => {
         return (
             <React.Fragment>
-                <Button label="New" icon="pi pi-plus" className="p-button-success mr-2" onClick={openNew} />
-                <Button label="Delete" icon="pi pi-trash" className="p-button-danger" onClick={confirmDeleteSelected} disabled={!selectedProducts || !selectedProducts.length} />
+                <Button label="Nuevo" icon="pi pi-plus" className="p-button-success mr-2" onClick={openNew} />
+                {/* <Button label="Delete" icon="pi pi-trash" className="p-button-danger" onClick={confirmDeleteSelected} disabled={!selectedProducts || !selectedProducts.length} /> */}
             </React.Fragment>
         )
     }
@@ -243,50 +239,35 @@ function DashboardProgram() {
     const rightToolbarTemplate = () => {
         return (
             <React.Fragment>
-                <FileUpload mode="basic" name="demo[]" auto url="https://primefaces.org/primereact/showcase/upload.php" accept=".csv" chooseLabel="Import" className="mr-2 inline-block" onUpload={importCSV} />
-                <Button label="Export" icon="pi pi-upload" className="p-button-help" onClick={exportCSV} />
+                {/* <FileUpload mode="basic" name="demo[]" auto url="https://primefaces.org/primereact/showcase/upload.php" accept=".csv" chooseLabel="Import" className="mr-2 inline-block" onUpload={importCSV} />
+                <Button label="Export" icon="pi pi-upload" className="p-button-help" onClick={exportCSV} /> */}
             </React.Fragment>
         )
-    }
-
-    const imageBodyTemplate = (rowData) => {
-        return <img src={`images/product/${rowData.image}`} onError={(e) => e.target.src = 'https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png'} alt={rowData.image} className="product-image" />
-    }
-
-    const priceBodyTemplate = (rowData) => {
-        return formatCurrency(rowData.price);
-    }
-
-    const ratingBodyTemplate = (rowData) => {
-        return <Rating value={rowData.rating} readOnly cancel={false} />;
-    }
-
-    const statusBodyTemplate = (rowData) => {
-        return <span className={`product-badge status-${rowData.inventoryStatus.toLowerCase()}`}>{rowData.inventoryStatus}</span>;
     }
 
     const actionBodyTemplate = (rowData) => {
         return (
             <React.Fragment>
                 <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editProduct(rowData)} />
-                <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDeleteProduct(rowData)} />
+                {/* <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDeleteProduct(rowData)} /> */}
+                <Button label="Competencias asociadas"/>
             </React.Fragment>
         );
     }
 
     const header = (
         <div className="table-header">
-            <h5 className="mx-0 my-1">Manage Products</h5>
+            <h5 className="mx-0 my-1">Programas</h5>
             <span className="p-input-icon-left">
                 <i className="pi pi-search" />
-                <InputText type="search" onInput={(e) => setGlobalFilter(e.target.value)} placeholder="Search..." />
+                <InputText type="search" onInput={(e) => setGlobalFilter(e.target.value)} placeholder="Buscar..." />
             </span>
         </div>
     );
     const productDialogFooter = (
         <React.Fragment>
-            <Button label="Cancel" icon="pi pi-times" className="p-button-text" onClick={hideDialog} />
-            <Button label="Save" icon="pi pi-check" className="p-button-text" onClick={saveProduct} />
+            <Button label="Cancelar" icon="pi pi-times" className="p-button-text" style={{color:"gray"}} onClick={hideDialog} />
+            <Button label="Guardar" icon="pi pi-check" className="p-button-text" style= {{color: "#5EB319"}} onClick={saveProduct} />
         </React.Fragment>
     );
     const deleteProductDialogFooter = (
@@ -311,7 +292,7 @@ function DashboardProgram() {
                 <DataTable ref={dt} value={products} selection={selectedProducts} onSelectionChange={(e) => setSelectedProducts(e.value)}
                     dataKey="id" paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
+                    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} programas"
                     globalFilter={globalFilter} header={header} responsiveLayout="scroll">
                     <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} exportable={false}></Column>
                     <Column field="id" header="Id" style={{ minWidth: '12rem' }}></Column>
@@ -335,7 +316,7 @@ function DashboardProgram() {
                     <label htmlFor="name">Código</label>
                     <InputText
                         id="name"
-                        value={product.name}
+                        value={product.code}
                         onChange={(e) => onInputChange(e, 'name')}
                         required autoFocus
                         className={classNames({ 'p-invalid': submitted && !product.name })} />
