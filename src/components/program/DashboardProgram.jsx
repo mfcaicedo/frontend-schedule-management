@@ -33,8 +33,6 @@ function DashboardProgram() {
     const toast = useRef(null);
     const dt = useRef(null);
 
-
-
     const loadProgram = () => {
         let baseUrl = "http://localhost:8080/program";
         axios.get(baseUrl).then(response =>

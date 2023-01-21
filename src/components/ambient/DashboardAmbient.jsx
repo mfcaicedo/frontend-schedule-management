@@ -16,12 +16,11 @@ import axios from "axios";
 
 function DashboardAmbient() {
 
-    const [competence, setCompetence] = useState([]);
     const [products, setProducts] = useState(null);
-    const [productDialog, setProductDialog] = useState(false);
+    const [productDialog, setAmbientDialog] = useState(false);
     const [deleteProductDialog, setDeleteProductDialog] = useState(false);
     const [deleteProductsDialog, setDeleteProductsDialog] = useState(false);
-    const [product, setProduct] = useState([]);
+    const [product, setAmbient] = useState([]);
     const [selectedProducts, setSelectedProducts] = useState(null);
     const [submitted, setSubmitted] = useState(false);
     const [globalFilter, setGlobalFilter] = useState(null);
@@ -31,13 +30,21 @@ function DashboardAmbient() {
     const toast = useRef(null);
     const dt = useRef(null);
 
-
-
     const loadAmbient = () => {
         let baseUrl = "http://localhost:8080/ambient";
         axios.get(baseUrl).then(response =>
-            // setCompetence(response.data)
-            setProducts(response.data)
+            setProducts(
+                response.data.map((ambient) => {
+                    return {
+                        id: ambient.id,
+                        name: ambient.name,
+                        location: ambient.location,
+                        typeEnvironment: ambient.typeEnvironment,
+                        ability: ambient.ability,
+                        state: ambient.state
+                    }
+                })
+            )
         );
     };
 
@@ -45,46 +52,44 @@ function DashboardAmbient() {
         id: null,
         name: '',
         location: '',
-        typeEnvironment: '',
+        typeEnvironment: -1,
         ability: '',
         state: '',
-        schedule: null,
     };
 
     const typeOptions = [
         {
-            label: 'Genérica',
-            input: 'Generica'
+            label: 'Virtual',
+            input: 0
         },
         {
-            label: 'Específica',
-            input: 'Especifica'
+            label: 'Presencial',
+            input: 1
         }
     ];
 
     useEffect(() => {
         loadAmbient();
-        console.log("competence", competence)
         console.log("producr", product)
 
     }, []);
 
 
-    const formatCurrency = (value) => {
-        return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-    }
+    // const formatCurrency = (value) => {
+    //     return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+    // }
 
     console.log("products", product);
 
     const openNew = () => {
-        setProduct(emptyAmbient);
+        setAmbient(emptyAmbient);
         setSubmitted(false);
-        setProductDialog(true);
+        setAmbientDialog(true);
     }
 
     const hideDialog = () => {
         setSubmitted(false);
-        setProductDialog(false);
+        setAmbientDialog(false);
     }
 
     const hideDeleteProductDialog = () => {
@@ -95,38 +100,35 @@ function DashboardAmbient() {
         setDeleteProductsDialog(false);
     }
 
-    const saveProduct = () => {
+    const saveAmbient = () => {
         setSubmitted(true);
-
+        //completo los campos 
+        product.state = 'Activo';
+        product.typeEnvironment = product.typeEnvironment.input;
+        //console.log("type", product)
+        //return 0
+        delete product.id; //elimino el id porque es autoincrementable
         if (product.name.trim()) {
-            let _products = [...products];
-            let _product = { ...product };
-            if (product.id) {
-                const index = findIndexById(product.id);
-
-                _products[index] = _product;
-                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Updated', life: 3000 });
-            }
-            else {
-                _product.id = createId();
-                _product.image = 'product-placeholder.svg';
-                _products.push(_product);
-                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
-            }
-
-            setProducts(_products);
-            setProductDialog(false);
-            setProduct(emptyAmbient);
+            //hago la peticion a la api para guardar el registro
+            axios.post("http://localhost:8080/ambient", product)
+                .then(response => {
+                    if (response.data != null) {
+                        toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Ambiente creado', life: 5000 });
+                        setAmbientDialog(false);
+                        setAmbient(emptyAmbient);
+                        loadAmbient();
+                    }
+                });
         }
     }
 
     const editProduct = (product) => {
-        setProduct({ ...product });
-        setProductDialog(true);
+        setAmbient({ ...product });
+        setAmbientDialog(true);
     }
 
     const confirmDeleteProduct = (product) => {
-        setProduct(product);
+        setAmbient(product);
         setDeleteProductDialog(true);
     }
 
@@ -134,7 +136,7 @@ function DashboardAmbient() {
         let _products = products.filter(val => val.id !== product.id);
         setProducts(_products);
         setDeleteProductDialog(false);
-        setProduct(emptyAmbient);
+        setAmbient(emptyAmbient);
         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 3000 });
     }
 
@@ -159,42 +161,6 @@ function DashboardAmbient() {
         return id;
     }
 
-    const importCSV = (e) => {
-        const file = e.files[0];
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const csv = e.target.result;
-            const data = csv.split('\n');
-
-            // Prepare DataTable
-            const cols = data[0].replace(/['"]+/g, '').split(',');
-            data.shift();
-
-            const importedData = data.map(d => {
-                d = d.split(',');
-                const processedData = cols.reduce((obj, c, i) => {
-                    c = c === 'Status' ? 'inventoryStatus' : (c === 'Reviews' ? 'rating' : c.toLowerCase());
-                    obj[c] = d[i].replace(/['"]+/g, '');
-                    (c === 'price' || c === 'rating') && (obj[c] = parseFloat(obj[c]));
-                    return obj;
-                }, {});
-
-                processedData['id'] = createId();
-                return processedData;
-            });
-
-            const _products = [...products, ...importedData];
-
-            setProducts(_products);
-        };
-
-        reader.readAsText(file, 'UTF-8');
-    }
-
-    const exportCSV = () => {
-        dt.current.exportCSV();
-    }
-
     const confirmDeleteSelected = () => {
         setDeleteProductsDialog(true);
     }
@@ -210,7 +176,7 @@ function DashboardAmbient() {
     const onCategoryChange = (e) => {
         let _product = { ...product };
         _product['category'] = e.value;
-        setProduct(_product);
+        setAmbient(_product);
     }
 
     const onInputChange = (e, name) => {
@@ -218,7 +184,7 @@ function DashboardAmbient() {
         let _product = { ...product };
         _product[`${name}`] = val;
 
-        setProduct(_product);
+        setAmbient(_product);
     }
 
     const onInputNumberChange = (e, name) => {
@@ -226,14 +192,14 @@ function DashboardAmbient() {
         let _product = { ...product };
         _product[`${name}`] = val;
 
-        setProduct(_product);
+        setAmbient(_product);
     }
 
     const leftToolbarTemplate = () => {
         return (
             <React.Fragment>
                 <Button label="Nuevo" icon="pi pi-plus" className="p-button-success mr-2" onClick={openNew} />
-                <Button label="Inactivar"  className="p-button-danger" onClick={confirmDeleteSelected} disabled={!selectedProducts || !selectedProducts.length} />
+                <Button label="Inactivar" className="p-button-danger" onClick={confirmDeleteSelected} disabled={!selectedProducts || !selectedProducts.length} />
             </React.Fragment>
         )
     }
@@ -267,8 +233,8 @@ function DashboardAmbient() {
     );
     const productDialogFooter = (
         <React.Fragment>
-            <Button label="Cancelar" icon="pi pi-times" className="p-button-text" style= {{color: "gray"}} onClick={hideDialog} />
-            <Button label="Guardar" icon="pi pi-check" className="p-button-text" style= {{color: "#5EB319"}} onClick={saveProduct} />
+            <Button label="Cancelar" icon="pi pi-times" className="p-button-text" style={{ color: "gray" }} onClick={hideDialog} />
+            <Button label="Guardar" icon="pi pi-check" className="p-button-text" style={{ color: "#5EB319" }} onClick={saveAmbient} />
         </React.Fragment>
     );
     const deleteProductDialogFooter = (
@@ -302,7 +268,6 @@ function DashboardAmbient() {
                     <Column field="typeEnvironment" header="Tipo de ambiente" ></Column>
                     <Column field="state" header="Estado" ></Column>
                     {/* //<Column field="state" header="Estado" style={{ minWidth: '8rem' }}></Column> */}
-                    <Column field="schedule" header="Schedule" sortable style={{ minWidth: '10rem' }}></Column>
                     <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '8rem' }}></Column>
                 </DataTable>
             </div>
@@ -316,7 +281,6 @@ function DashboardAmbient() {
                     </p>
                 </div>
                 <div className="field">
-
                     <label htmlFor="name">Nombre</label>
                     <InputText
                         id="name"
@@ -324,34 +288,47 @@ function DashboardAmbient() {
                         onChange={(e) => onInputChange(e, 'name')}
                         required autoFocus
                         className={classNames({ 'p-invalid': submitted && !product.name })} />
-                    {submitted && !product.name && <small className="p-error">Name is required.</small>}
+                    {submitted && !product.name && <small className="p-error">Nombre es requerido.</small>}
                 </div>
                 <div className="field">
-                    <label htmlFor="type">Ubicación</label>
+                    <label htmlFor="location">Ubicación</label>
                     <InputText
-                        id="name"
-                        value={product.name}
-                        onChange={(e) => onInputChange(e, 'name')}
+                        id="location"
+                        value={product.location}
+                        onChange={(e) => onInputChange(e, 'location')}
                         required autoFocus
-                        className={classNames({ 'p-invalid': submitted && !product.name })} />
-                    {submitted && !product.name && <small className="p-error">Name is required.</small>}
+                        className={classNames({ 'p-invalid': submitted && !product.location })} />
+                    {submitted && !product.location && <small className="p-error">Ubicación es requerida.</small>}
                 </div>
                 <div className="field">
-                    <label htmlFor="type">Tipo de ambiente</label>
+                    <label htmlFor="typeEnvironment">Tipo de ambiente</label>
                     <Dropdown
                         style={{
                             borderBlockColor: "#5EB319",
                             boxShadow: "0px 0px 0px 0.2px #5EB319",
                             borderColor: "#5EB319",
-
                         }}
-                        name="type"
+                        name="typeEnvironment"
                         value={selectType}
                         options={typeOptions}
-                        onChange={(e) => setSelectType(e.value)}
+                        onChange={(e) => {
+                            setSelectType(e.value)
+                            onInputChange(e, "typeEnvironment")
+                            console.log("prueba", e.value)
+                        }}
                         optionLabel="label"
                         placeholder="Seleccione tipo"
                     />
+                </div>
+                <div className="field">
+                    <label htmlFor="ability">Capacidad</label>
+                    <InputText
+                        id="ability"
+                        value={product.ability}
+                        onChange={(e) => onInputChange(e, 'ability')}
+                        required autoFocus
+                        className={classNames({ 'p-invalid': submitted && !product.ability })} />
+                    {submitted && !product.ability && <small className="p-error">Capacidad es requerida.</small>}
                 </div>
             </Dialog>
 
