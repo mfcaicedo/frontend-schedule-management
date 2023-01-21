@@ -31,6 +31,8 @@ function DashboardAcademicPeriod() {
     const [fechaInicio, setFechaInicio] = useState(null);
     const [fechaFinalizacion, setFechaFinalizacion] = useState(null);
 
+    
+
 
     //Referencias 
     const toast = useRef(null);
@@ -41,7 +43,16 @@ function DashboardAcademicPeriod() {
     const loadAcademicPeriod = () => {
         let baseUrl = "http://localhost:8080/academicPeriod";
         axios.get(baseUrl).then(response =>
-            setProducts(response.data)
+            setProducts(
+                response.data.map((academicPeriod) =>{
+                    return{
+                        id: academicPeriod.id,
+                        name: academicPeriod.name,
+                        date_init: academicPeriod.date_init,
+                        date_end: academicPeriod.date_end
+                    }
+                })
+            )
         );
     };
 
@@ -50,7 +61,6 @@ function DashboardAcademicPeriod() {
         name: '',
         date_init: '',
         date_end: '',
-        //program: null,
     };
 
 
@@ -81,26 +91,37 @@ function DashboardAcademicPeriod() {
 
     const saveProduct = () => {
         setSubmitted(true);
+        console.log("product", product);
+        //Fecha inicio
+        let fecha = product.date_init;
+        let dia = fecha.getDate() < 9 ? `0${fecha.getDate()}` : fecha.getDate()
+        let mes = fecha.getMonth()+1 < 9 ? `0${fecha.getMonth()+1}` : fecha.getMonth()+1
+        let year = fecha.getFullYear()
+        let fechaCompletaIni = `${year}-${mes}-${dia}`
+        product.date_init = fechaCompletaIni
+        //Fecha finalizacion
+        let fechaFin = product.date_end;
+        let diaFin = fechaFin.getDate() < 9 ? `0${fechaFin.getDate()}` : fechaFin.getDate()
+        let mesFin = fechaFin.getMonth()+1 < 9 ? `0${fechaFin.getMonth()+1}` : fechaFin.getMonth()+1
+        let yearFin = fechaFin.getFullYear()
+        let fechaCompletaFin = `${yearFin}-${mesFin}-${diaFin}`
+        product.date_end = fechaCompletaFin
+
+
+        delete product.id; //elimino el id porque es autoincrementable
 
         if (product.name.trim()) {
-            let _products = [...products];
-            let _product = { ...product };
-            if (product.id) {
-                const index = findIndexById(product.id);
 
-                _products[index] = _product;
-                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Updated', life: 3000 });
-            }
-            else {
-                _product.id = createId();
-                _product.image = 'product-placeholder.svg';
-                _products.push(_product);
-                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
-            }
-
-            setProducts(_products);
-            setProductDialog(false);
-            setProduct(emptyAcademicPeriod);
+            //hago la peticion a la api para guardar el registro
+            axios.post("http://localhost:8080/academicPeriod", product)
+                .then(response => {
+                    if (response.data != null) {
+                        toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Periodo Académico creado', life: 5000 });
+                        setProductDialog(false);
+                        setProduct(emptyAcademicPeriod);
+                        loadAcademicPeriod();
+                    }
+                });
         }
     }
 
@@ -141,42 +162,6 @@ function DashboardAcademicPeriod() {
             id += chars.charAt(Math.floor(Math.random() * chars.length));
         }
         return id;
-    }
-
-    const importCSV = (e) => {
-        const file = e.files[0];
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const csv = e.target.result;
-            const data = csv.split('\n');
-
-            // Prepare DataTable
-            const cols = data[0].replace(/['"]+/g, '').split(',');
-            data.shift();
-
-            const importedData = data.map(d => {
-                d = d.split(',');
-                const processedData = cols.reduce((obj, c, i) => {
-                    c = c === 'Status' ? 'inventoryStatus' : (c === 'Reviews' ? 'rating' : c.toLowerCase());
-                    obj[c] = d[i].replace(/['"]+/g, '');
-                    (c === 'price' || c === 'rating') && (obj[c] = parseFloat(obj[c]));
-                    return obj;
-                }, {});
-
-                processedData['id'] = createId();
-                return processedData;
-            });
-
-            const _products = [...products, ...importedData];
-
-            setProducts(_products);
-        };
-
-        reader.readAsText(file, 'UTF-8');
-    }
-
-    const exportCSV = () => {
-        dt.current.exportCSV();
     }
 
     const confirmDeleteSelected = () => {
@@ -285,8 +270,6 @@ function DashboardAcademicPeriod() {
                     <Column field="name" header="Nombre" sortable style={{ minWidth: '16rem' }}></Column>
                     <Column field="date_init" header="Fecha de inicio" ></Column>
                     <Column field="date_end" header="Fecha de finalización" style={{ minWidth: '8rem' }}></Column>
-                    {/* <Column field="rating" header="Reviews" body={ratingBodyTemplate} sortable style={{ minWidth: '12rem' }}></Column> */}
-                    {/* <Column field="inventoryStatus" header="Status" body={statusBodyTemplate} sortable style={{ minWidth: '12rem' }}></Column> */}
                     <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '8rem' }}></Column>
                 </DataTable>
             </div>
@@ -307,17 +290,25 @@ function DashboardAcademicPeriod() {
                         onChange={(e) => onInputChange(e, 'name')}
                         required autoFocus
                         className={classNames({ 'p-invalid': submitted && !product.name })} />
-                    {submitted && !product.name && <small className="p-error">Name is required.</small>}
+                    {submitted && !product.name && <small className="p-error">Nombre requerido.</small>}
                 </div>
                 
                 <div className="field">
-                    <label htmlFor="basic">Fecha de Inicio</label>
-                    <Calendar id="basic" value={fechaInicio} onChange={(e) => setFechaInicio(e.value)} dateFormat="dd-mm-yy" />
+                    <label htmlFor="date_init">Fecha de Inicio</label>
+                    <Calendar id="date_init" value={fechaInicio} onChange={(e) => 
+                        {                    
+                            setFechaInicio(e.value)
+                            onInputChange(e, "date_init")
+                        }} dateFormat="yy-mm-dd" />
                 </div>
 
                 <div className="field">
-                    <label htmlFor="basic">Fecha de Finalización</label>
-                    <Calendar id="basic" value={fechaFinalizacion} onChange={(e) => setFechaFinalizacion(e.value)} dateFormat="dd-mm-yy" />
+                    <label htmlFor="date_end">Fecha de Finalización</label>
+                    <Calendar id="date_end" value={fechaFinalizacion} onChange={(e) => 
+                        {
+                            setFechaFinalizacion(e.value)
+                            onInputChange(e, "date_end")
+                        }} dateFormat="yy-mm-dd" />
                 </div>
 
             </Dialog>
