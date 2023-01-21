@@ -23,7 +23,7 @@ import axios from "axios";
 function DashboardCompetence() {
 
     const [competence, setCompetence] = useState([]);
-    const [products, setProducts] = useState(null);
+    const [products, setProducts] = useState([]);
     const [productDialog, setProductDialog] = useState(false);
     const [deleteProductDialog, setDeleteProductDialog] = useState(false);
     const [deleteProductsDialog, setDeleteProductsDialog] = useState(false);
@@ -32,8 +32,11 @@ function DashboardCompetence() {
     const [submitted, setSubmitted] = useState(false);
     const [globalFilter, setGlobalFilter] = useState(null);
     const [selectType, setSelectType] = useState(null);
+    const [selectProgram, setSelectProgram] = useState(null);
+    const [program, setProgram] = useState(new Array());
+    const [optionsProgram, setOptionsProgram] = useState([]);
 
-    //Referencias 
+    //Referencias
     const toast = useRef(null);
     const dt = useRef(null);
 
@@ -41,12 +44,58 @@ function DashboardCompetence() {
 
     const loadCompetence = () => {
         let baseUrl = "http://localhost:8080/competence";
-        axios.get(baseUrl).then(response =>
+        axios.get(baseUrl).then(response => {
             // setCompetence(response.data)
-            setProducts(response.data)
+            // setProducts(response.data)
+            setProducts(
+                response.data.map((competence) => {
+                    return {
+                        id: competence.id,
+                        name: competence.name,
+                        type: competence.type,
+                        state: competence.state,
+                        program_id: competence.program_id
+                    }
+                })
+            )
+            response.data.map((competence) => {
+                console.log("competence", competence);
+            })
+            // console.log("competencia", response.data)
+        }
         );
     };
 
+    /**
+     * Metodop para cargar los programas de la base de datos
+     */
+    const loadProgram = () => {
+        let baseUrl = "http://localhost:8080/program";
+        let arrayData = [];
+        axios.get(baseUrl).then(response =>  {
+            //agrego al estado
+            // response.data.map((program) => {
+            //     console.log("program", program);
+            // })
+
+            setProgram(response.data)
+            //agrego al array de programas 
+            arrayData = response.data
+            console.log("ver", arrayData);
+            setOptionsProgram(
+                arrayData.map((program) => {
+                return {
+                    label: program.name,
+                    value: program.id
+                }
+            }))
+        }
+        );
+    };
+
+    /**
+     * Rrepresentacion del objeto que se va a guardar en la base de datos
+     */
     let emptyCompetence = {
         id: null,
         name: '',
@@ -68,8 +117,7 @@ function DashboardCompetence() {
 
     useEffect(() => {
         loadCompetence();
-        console.log("competence", competence)
-        console.log("producr", product)
+        loadProgram();
 
     }, []);
 
@@ -77,8 +125,6 @@ function DashboardCompetence() {
     const formatCurrency = (value) => {
         return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
     }
-
-    console.log("products", product);
 
     const openNew = () => {
         setProduct(emptyCompetence);
@@ -101,27 +147,51 @@ function DashboardCompetence() {
 
     const saveProduct = () => {
         setSubmitted(true);
-
+        //completo los campos 
+        console.log("este", product);
+        product.state = 'Activo';
+        product.type = product.type.input;
+        delete product.id; //elimino el id porque es autoincrementable
+        //busco el programa seleccionado
+        let selectProgram = program.find(program => program.id === product.program);
+        product.program = selectProgram ? selectProgram : null;
+        console.log("que paso", product);
+        // return 0 ; 
         if (product.name.trim()) {
-            let _products = [...products];
-            let _product = { ...product };
-            if (product.id) {
-                const index = findIndexById(product.id);
-
-                _products[index] = _product;
-                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Updated', life: 3000 });
-            }
-            else {
-                _product.id = createId();
-                _product.image = 'product-placeholder.svg';
-                _products.push(_product);
-                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
-            }
-
-            setProducts(_products);
-            setProductDialog(false);
-            setProduct(emptyCompetence);
+            //hago la peticion a la api para guardar el registro
+            axios.post("http://localhost:8080/competence", product)
+                .then(response => {
+                    if (response.data != null) {
+                        toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Competencia creada', life: 5000 });
+                        setProductDialog(false);
+                        setProduct(emptyCompetence);
+                        loadCompetence();
+                    }
+                });
         }
+
+        // return 0; 
+
+        // if (product.name.trim()) {
+        //     let _products = [...products];
+        //     let _product = { ...product };
+        //     if (product.id) {
+        //         const index = findIndexById(product.id);
+
+        //         _products[index] = _product;
+        //         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Updated', life: 3000 });
+        //     }
+        //     else {
+        //         _product.id = createId();
+        //         _product.image = 'product-placeholder.svg';
+        //         _products.push(_product);
+        //         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
+        //     }
+
+        //     setProducts(_products);
+        //     setProductDialog(false);
+        //     setProduct(emptyCompetence);
+        // }
     }
 
     const editProduct = (product) => {
@@ -285,10 +355,10 @@ function DashboardCompetence() {
             </span>
         </div>
     );
-    const productDialogFooter = (
+    const competenceDialogFooter = (
         <React.Fragment>
-            <Button label="Cancel" icon="pi pi-times" className="p-button-text" onClick={hideDialog} />
-            <Button label="Save" icon="pi pi-check" className="p-button-text" onClick={saveProduct} />
+            <Button label="Cancelar" icon="pi pi-times" className="p-button-text" onClick={hideDialog} />
+            <Button label="Guardar" icon="pi pi-check" className="p-button-text" onClick={saveProduct} />
         </React.Fragment>
     );
     const deleteProductDialogFooter = (
@@ -329,7 +399,7 @@ function DashboardCompetence() {
 
             <Dialog visible={productDialog} style={{ width: '450px' }}
                 header={<img src={logo} alt={"logo"} className="block m-auto pb-0 " />}
-                modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
+                modal className="p-fluid" footer={competenceDialogFooter} onHide={hideDialog}>
                 <div className="title-form" style={{ color: "#5EB319", fontWeight: "bold", fontSize: "22px" }}>
                     <p style={{ marginTop: "0px" }}>
                         Crear competencia
@@ -348,54 +418,45 @@ function DashboardCompetence() {
                 </div>
                 <div className="field">
                     <label htmlFor="type">Tipo</label>
-                    <Dropdown 
-                    style={{
-                        borderBlockColor: "#5EB319",
-                        boxShadow: "0px 0px 0px 0.2px #5EB319",
-                        borderColor: "#5EB319",
+                    <Dropdown
+                        style={{
+                            borderBlockColor: "#5EB319",
+                            boxShadow: "0px 0px 0px 0.2px #5EB319",
+                            borderColor: "#5EB319",
 
-                    }}
-                    name="type"
-                    value={selectType} 
-                    options={typeOptions} 
-                    onChange={(e) => setSelectType(e.value)} 
-                    optionLabel="label" 
-                    placeholder="Seleccione tipo" 
+                        }}
+                        name="type"
+                        value={selectType}
+                        options={typeOptions}
+                        onChange={(e) => {
+                            setSelectType(e.value)
+                            onInputChange(e, 'type')
+                        }}
+                        optionLabel="label"
+                        placeholder="Seleccione tipo"
+                    />
+                </div>
+                <div className="field">
+                    <label htmlFor="program">Seleccione programa al que pertenece</label>
+                    <Dropdown
+                        style={{
+                            borderBlockColor: "#5EB319",
+                            boxShadow: "0px 0px 0px 0.2px #5EB319",
+                            borderColor: "#5EB319",
+
+                        }}
+                        name="program"
+                        value={selectProgram}
+                        options={optionsProgram}
+                        onChange={(e) => {
+                            setSelectProgram(e.value)
+                            onInputChange(e, 'program')
+                        }}
+                        optionLabel="label"
+                        placeholder="Seleccione programa"
                     />
                 </div>
 
-                <div className="field">
-                    <label className="mb-3">Category</label>
-                    <div className="formgrid grid">
-                        <div className="field-radiobutton col-6">
-                            <RadioButton inputId="category1" name="category" value="Accessories" onChange={onCategoryChange} checked={product.category === 'Accessories'} />
-                            <label htmlFor="category1">Accessories</label>
-                        </div>
-                        <div className="field-radiobutton col-6">
-                            <RadioButton inputId="category2" name="category" value="Clothing" onChange={onCategoryChange} checked={product.category === 'Clothing'} />
-                            <label htmlFor="category2">Clothing</label>
-                        </div>
-                        <div className="field-radiobutton col-6">
-                            <RadioButton inputId="category3" name="category" value="Electronics" onChange={onCategoryChange} checked={product.category === 'Electronics'} />
-                            <label htmlFor="category3">Electronics</label>
-                        </div>
-                        <div className="field-radiobutton col-6">
-                            <RadioButton inputId="category4" name="category" value="Fitness" onChange={onCategoryChange} checked={product.category === 'Fitness'} />
-                            <label htmlFor="category4">Fitness</label>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="formgrid grid">
-                    <div className="field col">
-                        <label htmlFor="price">Price</label>
-                        <InputNumber id="price" value={product.price} onValueChange={(e) => onInputNumberChange(e, 'price')} mode="currency" currency="USD" locale="en-US" />
-                    </div>
-                    <div className="field col">
-                        <label htmlFor="quantity">Quantity</label>
-                        <InputNumber id="quantity" value={product.quantity} onValueChange={(e) => onInputNumberChange(e, 'quantity')} integeronly />
-                    </div>
-                </div>
             </Dialog>
 
             <Dialog visible={deleteProductDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductDialogFooter} onHide={hideDeleteProductDialog}>
