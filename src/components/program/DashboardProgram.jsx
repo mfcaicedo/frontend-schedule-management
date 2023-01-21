@@ -17,7 +17,6 @@ import axios from "axios";
 
 function DashboardProgram() {
 
-    const [competence, setCompetence] = useState([]);
     const [products, setProducts] = useState(null);
     const [productDialog, setProductDialog] = useState(false);
     const [deleteProductDialog, setDeleteProductDialog] = useState(false);
@@ -26,7 +25,9 @@ function DashboardProgram() {
     const [selectedProducts, setSelectedProducts] = useState(null);
     const [submitted, setSubmitted] = useState(false);
     const [globalFilter, setGlobalFilter] = useState(null);
-    const [selectType, setSelectType] = useState(null);
+    const [selectAcademicPeriod, setSelectAcademicPeriod] = useState(null);
+    const [academicPeriod, setAcademicPeriod] = useState([]);
+    const [academicPeriodOptions, setAcademicPeriodOptions] = useState(null);
 
     //Referencias 
     const toast = useRef(null);
@@ -37,40 +38,56 @@ function DashboardProgram() {
     const loadProgram = () => {
         let baseUrl = "http://localhost:8080/program";
         axios.get(baseUrl).then(response =>
-            // setCompetence(response.data)
-            setProducts(response.data)
+            setProducts(
+                response.data.map((program) => {
+                    return {
+                        id: program.id,
+                        code: program.code,
+                        name: program.name,
+                        academic_period_id: program.academic_period_id
+                    }
+                })
+            )
         );
     };
+
+    const loadAcademicPeriod = () => {
+        let baseUrl = "http://localhost:8080/academicPeriod";
+        let arrayData = [];
+        axios.get(baseUrl).then(response => {
+            setAcademicPeriod(response.data)
+            arrayData = response.data
+            setAcademicPeriodOptions(
+                arrayData.map((academicPeriod) => {
+                    return {
+                        label: academicPeriod.name,
+                        value: academicPeriod.id
+                    }
+                })
+            )
+        }
+        )
+    }
 
     let emptyProgram = {
         id: null,
         code: '',
         name: '',
-        academic_period: null,
+        academicPeriod: null,
     };
-
-    const typeOptions = [
-        {
-            label: 'Genérica',
-            input: 'Generica'
-        },
-        {
-            label: 'Específica',
-            input: 'Especifica'
-        }
-    ];
 
     useEffect(() => {
         loadProgram();
-        console.log("competence", competence)
-        console.log("producr", product)
-
+        loadAcademicPeriod();
+        // console.log("competence", competence)
+        // console.log("producr", product)
+        // console.log("periodoA", academicPeriod)
     }, []);
 
 
-    const formatCurrency = (value) => {
-        return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-    }
+    // const formatCurrency = (value) => {
+    //     return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+    // }
 
     console.log("products", product);
 
@@ -93,28 +110,26 @@ function DashboardProgram() {
         setDeleteProductsDialog(false);
     }
 
-    const saveProduct = () => {
+    const saveProgram = () => {
         setSubmitted(true);
-
+        //completo los campos 
+        console.log("este", product);
+        delete product.id; //elimino el id porque es autoincrementable
+        //busco el programa seleccionado
+        let selectAcademicPeriod = academicPeriod.find(academicPeriod => academicPeriod.id === product.academicPeriod);
+        product.academicPeriod = selectAcademicPeriod ? selectAcademicPeriod : null;
+        console.log("que paso", product);
         if (product.name.trim()) {
-            let _products = [...products];
-            let _product = { ...product };
-            if (product.id) {
-                const index = findIndexById(product.id);
-
-                _products[index] = _product;
-                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Updated', life: 3000 });
-            }
-            else {
-                _product.id = createId();
-                _product.image = 'product-placeholder.svg';
-                _products.push(_product);
-                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
-            }
-
-            setProducts(_products);
-            setProductDialog(false);
-            setProduct(emptyProgram);
+            //hago la peticion a la api para guardar el registro
+            axios.post("http://localhost:8080/program", product)
+                .then(response => {
+                    if (response.data != null) {
+                        toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Programa creado', life: 5000 });
+                        setProductDialog(false);
+                        setProduct(emptyProgram);
+                        loadAcademicPeriod();
+                    }
+                });
         }
     }
 
@@ -157,45 +172,9 @@ function DashboardProgram() {
         return id;
     }
 
-    const importCSV = (e) => {
-        const file = e.files[0];
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const csv = e.target.result;
-            const data = csv.split('\n');
-
-            // Prepare DataTable
-            const cols = data[0].replace(/['"]+/g, '').split(',');
-            data.shift();
-
-            const importedData = data.map(d => {
-                d = d.split(',');
-                const processedData = cols.reduce((obj, c, i) => {
-                    c = c === 'Status' ? 'inventoryStatus' : (c === 'Reviews' ? 'rating' : c.toLowerCase());
-                    obj[c] = d[i].replace(/['"]+/g, '');
-                    (c === 'price' || c === 'rating') && (obj[c] = parseFloat(obj[c]));
-                    return obj;
-                }, {});
-
-                processedData['id'] = createId();
-                return processedData;
-            });
-
-            const _products = [...products, ...importedData];
-
-            setProducts(_products);
-        };
-
-        reader.readAsText(file, 'UTF-8');
-    }
-
-    const exportCSV = () => {
-        dt.current.exportCSV();
-    }
-
-    const confirmDeleteSelected = () => {
-        setDeleteProductsDialog(true);
-    }
+    // const confirmDeleteSelected = () => {
+    //     setDeleteProductsDialog(true);
+    // }
 
     const deleteSelectedProducts = () => {
         let _products = products.filter(val => !selectedProducts.includes(val));
@@ -205,11 +184,11 @@ function DashboardProgram() {
         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Products Deleted', life: 3000 });
     }
 
-    const onCategoryChange = (e) => {
-        let _product = { ...product };
-        _product['category'] = e.value;
-        setProduct(_product);
-    }
+    // const onCategoryChange = (e) => {
+    //     let _product = { ...product };
+    //     _product['category'] = e.value;
+    //     setProduct(_product);
+    // }
 
     const onInputChange = (e, name) => {
         const val = (e.target && e.target.value) || '';
@@ -219,13 +198,13 @@ function DashboardProgram() {
         setProduct(_product);
     }
 
-    const onInputNumberChange = (e, name) => {
-        const val = e.value || 0;
-        let _product = { ...product };
-        _product[`${name}`] = val;
+    // const onInputNumberChange = (e, name) => {
+    //     const val = e.value || 0;
+    //     let _product = { ...product };
+    //     _product[`${name}`] = val;
 
-        setProduct(_product);
-    }
+    //     setProduct(_product);
+    // }
 
     const leftToolbarTemplate = () => {
         return (
@@ -250,7 +229,7 @@ function DashboardProgram() {
             <React.Fragment>
                 <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editProduct(rowData)} />
                 {/* <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDeleteProduct(rowData)} /> */}
-                <Button label="Competencias asociadas"/>
+                <Button label="Competencias asociadas" />
             </React.Fragment>
         );
     }
@@ -266,8 +245,8 @@ function DashboardProgram() {
     );
     const productDialogFooter = (
         <React.Fragment>
-            <Button label="Cancelar" icon="pi pi-times" className="p-button-text" style={{color:"gray"}} onClick={hideDialog} />
-            <Button label="Guardar" icon="pi pi-check" className="p-button-text" style= {{color: "#5EB319"}} onClick={saveProduct} />
+            <Button label="Cancelar" icon="pi pi-times" className="p-button-text" style={{ color: "gray" }} onClick={hideDialog} />
+            <Button label="Guardar" icon="pi pi-check" className="p-button-text" style={{ color: "#5EB319" }} onClick={saveProgram} />
         </React.Fragment>
     );
     const deleteProductDialogFooter = (
@@ -298,7 +277,7 @@ function DashboardProgram() {
                     <Column field="id" header="Id" style={{ minWidth: '12rem' }}></Column>
                     <Column field="code" header="Código" style={{ minWidth: '16rem' }}></Column>
                     <Column field="name" header="Nombre" ></Column>
-                    <Column field="academic_period" header="Periodo Académico" ></Column>
+                    <Column field="academicPeriod" header="Periodo Académico" ></Column>
                     <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '8rem' }}></Column>
                 </DataTable>
             </div>
@@ -313,14 +292,14 @@ function DashboardProgram() {
                 </div>
                 <div className="field">
 
-                    <label htmlFor="name">Código</label>
+                    <label htmlFor="code">Código</label>
                     <InputText
-                        id="name"
+                        id="code"
                         value={product.code}
-                        onChange={(e) => onInputChange(e, 'name')}
+                        onChange={(e) => onInputChange(e, 'code')}
                         required autoFocus
-                        className={classNames({ 'p-invalid': submitted && !product.name })} />
-                    {submitted && !product.name && <small className="p-error">Name is required.</small>}
+                        className={classNames({ 'p-invalid': submitted && !product.code })} />
+                    {submitted && !product.code && <small className="p-error">Código requerido.</small>}
                 </div>
                 <div className="field">
                     <label htmlFor="type">Nombre</label>
@@ -330,10 +309,10 @@ function DashboardProgram() {
                         onChange={(e) => onInputChange(e, 'name')}
                         required autoFocus
                         className={classNames({ 'p-invalid': submitted && !product.name })} />
-                    {submitted && !product.name && <small className="p-error">Name is required.</small>}
+                    {submitted && !product.name && <small className="p-error">Nombre requerido.</small>}
                 </div>
                 <div className="field">
-                    <label htmlFor="type">Periodo Académico</label>
+                    <label htmlFor="academicPeriod">Periodo Académico</label>
                     <Dropdown
                         style={{
                             borderBlockColor: "#5EB319",
@@ -341,12 +320,15 @@ function DashboardProgram() {
                             borderColor: "#5EB319",
 
                         }}
-                        name="type"
-                        value={selectType}
-                        options={typeOptions}
-                        onChange={(e) => setSelectType(e.value)}
+                        name="academicPeriod"
+                        value={selectAcademicPeriod}
+                        options={academicPeriodOptions}
+                        onChange={(e) => {
+                            setSelectAcademicPeriod(e.value)
+                            onInputChange(e, 'academicPeriod')
+                        }}
                         optionLabel="label"
-                        placeholder="Seleccione tipo"
+                        placeholder="Seleccione periodo académico"
                     />
                 </div>
             </Dialog>
