@@ -17,12 +17,12 @@ function Navbar() {
             items: [
                 {
                     label: 'Left',
-                    icon: 'pi pi-fw pi-align-left', 
+                    icon: 'pi pi-fw pi-align-left',
                     command: () => {
                         window.location = "/schedule"
                     }
                 },
-            ], 
+            ],
 
         },
         {
@@ -35,21 +35,21 @@ function Navbar() {
                     items: [
                         {
                             label: 'Crear',
-                            icon: 'pi pi-plus-circle', 
+                            icon: 'pi pi-plus-circle',
                             command: () => {
                                 window.location = "/competence"
                             }
-                        }, 
+                        },
                         {
                             label: 'Ver',
-                            icon: 'pi pi-eye', 
+                            icon: 'pi pi-eye',
                             command: () => {
                                 window.location = "/view-competence"
                             }
-                        }, 
+                        },
                     ]
-        
-                }, 
+
+                },
                 {
                     label: 'Crear',
                     icon: 'pi pi-fw pi-user-plus',
@@ -58,28 +58,31 @@ function Navbar() {
                 {
                     label: 'Ver',
                     icon: 'pi pi-eye',
+                    command: () => {
+                        window.location = "/view-program"
+                    }
 
                 },
-                {
-                    label: 'Search',
-                    icon: 'pi pi-fw pi-users',
-                    items: [
-                        {
-                            label: 'Filter',
-                            icon: 'pi pi-fw pi-filter',
-                            items: [
-                                {
-                                    label: 'Print',
-                                    icon: 'pi pi-fw pi-print'
-                                }
-                            ]
-                        },
-                        {
-                            icon: 'pi pi-fw pi-bars',
-                            label: 'List'
-                        }
-                    ]
-                }
+                // {
+                //     label: 'Search',
+                //     icon: 'pi pi-fw pi-users',
+                //     items: [
+                //         {
+                //             label: 'Filter',
+                //             icon: 'pi pi-fw pi-filter',
+                //             items: [
+                //                 {
+                //                     label: 'Print',
+                //                     icon: 'pi pi-fw pi-print'
+                //                 }
+                //             ]
+                //         },
+                //         {
+                //             icon: 'pi pi-fw pi-bars',
+                //             label: 'List'
+                //         }
+                //     ]
+                // }
             ]
         },
         {
@@ -87,46 +90,29 @@ function Navbar() {
             icon: 'pi pi-building',
             items: [
                 {
-                    label: 'Edit',
-                    icon: 'pi pi-fw pi-pencil',
-                    items: [
-                        {
-                            label: 'Save',
-                            icon: 'pi pi-fw pi-calendar-plus'
-                        },
-                        {
-                            label: 'Delete',
-                            icon: 'pi pi-fw pi-calendar-minus'
-                        },
-
-                    ]
+                    label: 'Crear',
+                    icon: 'pi pi-plus-circle',
+                    command: () => {
+                        window.location = "/ambient"
+                    }
                 },
                 {
-                    label: 'Competencia',
-                    icon: 'pi pi-fw pi-calendar-times',
-                    items: [
-                        {
-                            label: 'Remove',
-                            icon: 'pi pi-fw pi-calendar-minus'
-                        }
-                    ]
-                }, 
-                {
-                    label: 'Periodo',
-                    icon: 'pi pi-fw pi-calendar-times',
-                    items: [
-                        {
-                            label: 'Remove',
-                            icon: 'pi pi-fw pi-calendar-minus'
-                        }
-                    ]
-                }
+                    label: 'Ver',
+                    icon: 'pi pi-eye',
+                    command: () => {
+                        window.location = "/view-ambient"
+                    }
+                },
             ]
+
         },
         {
             label: 'Periodo académico',
             icon: 'pi pi-clock',
-        }, 
+            command: () => {
+                window.location = "/view-academicperiod"
+            }
+        },
         {
             label: 'Docente',
             icon: 'pi pi-user'
