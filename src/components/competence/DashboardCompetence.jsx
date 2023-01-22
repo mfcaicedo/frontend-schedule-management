@@ -22,7 +22,6 @@ import axios from "axios";
 
 function DashboardCompetence() {
 
-    const [competence, setCompetence] = useState([]);
     const [products, setProducts] = useState([]);
     const [productDialog, setProductDialog] = useState(false);
     const [deleteProductDialog, setDeleteProductDialog] = useState(false);
@@ -72,7 +71,7 @@ function DashboardCompetence() {
     const loadProgram = () => {
         let baseUrl = "http://localhost:8080/program";
         let arrayData = [];
-        axios.get(baseUrl).then(response =>  {
+        axios.get(baseUrl).then(response => {
             //agrego al estado
             // response.data.map((program) => {
             //     console.log("program", program);
@@ -84,11 +83,11 @@ function DashboardCompetence() {
             console.log("ver", arrayData);
             setOptionsProgram(
                 arrayData.map((program) => {
-                return {
-                    label: program.name,
-                    value: program.id
-                }
-            }))
+                    return {
+                        label: program.name,
+                        value: program.id
+                    }
+                }))
         }
         );
     };
