@@ -67,11 +67,7 @@ function DashboardCompetence() {
     const loadProgram = () => {
         let baseUrl = "http://localhost:8080/program";
         let arrayData = [];
-<<<<<<< HEAD
-        axios.get(baseUrl).then(response =>  {
-=======
         axios.get(baseUrl).then(response => {
->>>>>>> 7f02c266abb09e63e827a27f7ddbc4c201f1322f
             //agrego al estado
             // response.data.map((program) => {
             //     console.log("program", program);
