@@ -4,7 +4,6 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
-import { Rating } from 'primereact/rating';
 import { Toolbar } from 'primereact/toolbar';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
@@ -16,12 +15,12 @@ import axios from "axios";
 
 function DashboardAmbient() {
 
-    const [products, setProducts] = useState(null);
-    const [productDialog, setAmbientDialog] = useState(false);
-    const [deleteProductDialog, setDeleteProductDialog] = useState(false);
-    const [deleteProductsDialog, setDeleteProductsDialog] = useState(false);
-    const [product, setAmbient] = useState([]);
-    const [selectedProducts, setSelectedProducts] = useState(null);
+    const [ambients, setAmbients] = useState(null);
+    const [ambientDialog, setAmbientDialog] = useState(false);
+    const [deleteAmbientDialog, setDeleteAmbientDialog] = useState(false);
+    const [deleteAmbientsDialog, setDeleteAmbientsDialog] = useState(false);
+    const [ambient, setAmbient] = useState([]);
+    const [selectedAmbient, setSelectedAmbient] = useState(null);
     const [submitted, setSubmitted] = useState(false);
     const [globalFilter, setGlobalFilter] = useState(null);
     const [selectType, setSelectType] = useState(null);
@@ -33,7 +32,7 @@ function DashboardAmbient() {
     const loadAmbient = () => {
         let baseUrl = "http://localhost:8080/ambient";
         axios.get(baseUrl).then(response =>
-            setProducts(
+            setAmbients(
                 response.data.map((ambient) => {
                     return {
                         id: ambient.id,
@@ -70,16 +69,11 @@ function DashboardAmbient() {
 
     useEffect(() => {
         loadAmbient();
-        console.log("producr", product)
+        console.log("producr", ambient)
 
     }, []);
 
-
-    // const formatCurrency = (value) => {
-    //     return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-    // }
-
-    console.log("products", product);
+    console.log("ambients", ambient);
 
     const openNew = () => {
         setAmbient(emptyAmbient);
@@ -93,24 +87,22 @@ function DashboardAmbient() {
     }
 
     const hideDeleteProductDialog = () => {
-        setDeleteProductDialog(false);
+        setDeleteAmbientDialog(false);
     }
 
     const hideDeleteProductsDialog = () => {
-        setDeleteProductsDialog(false);
+        setDeleteAmbientsDialog(false);
     }
 
     const saveAmbient = () => {
         setSubmitted(true);
         //completo los campos 
-        product.state = 'Activo';
-        product.typeEnvironment = product.typeEnvironment.input;
-        //console.log("type", product)
-        //return 0
-        delete product.id; //elimino el id porque es autoincrementable
-        if (product.name.trim()) {
+        ambient.state = 'Activo';
+        ambient.typeEnvironment = ambient.typeEnvironment.input;
+        delete ambient.id; //elimino el id porque es autoincrementable
+        if (ambient.name.trim()) {
             //hago la peticion a la api para guardar el registro
-            axios.post("http://localhost:8080/ambient", product)
+            axios.post("http://localhost:8080/ambient", ambient)
                 .then(response => {
                     if (response.data != null) {
                         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Ambiente creado', life: 5000 });
@@ -122,74 +114,39 @@ function DashboardAmbient() {
         }
     }
 
-    const editProduct = (product) => {
-        setAmbient({ ...product });
+    const editProduct = (ambient) => {
+        setAmbient({ ...ambient });
         setAmbientDialog(true);
     }
 
-    const confirmDeleteProduct = (product) => {
-        setAmbient(product);
-        setDeleteProductDialog(true);
+    const confirmDeleteProduct = (ambient) => {
+        setAmbient(ambient);
+        setDeleteAmbientDialog(true);
     }
 
     const deleteProduct = () => {
-        let _products = products.filter(val => val.id !== product.id);
-        setProducts(_products);
-        setDeleteProductDialog(false);
+        let _products = ambients.filter(val => val.id !== ambient.id);
+        setAmbients(_products);
+        setDeleteAmbientDialog(false);
         setAmbient(emptyAmbient);
         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 3000 });
     }
 
-    const findIndexById = (id) => {
-        let index = -1;
-        for (let i = 0; i < products.length; i++) {
-            if (products[i].id === id) {
-                index = i;
-                break;
-            }
-        }
-
-        return index;
-    }
-
-    const createId = () => {
-        let id = '';
-        let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        for (let i = 0; i < 5; i++) {
-            id += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        return id;
-    }
-
     const confirmDeleteSelected = () => {
-        setDeleteProductsDialog(true);
+        setDeleteAmbientsDialog(true);
     }
 
     const deleteSelectedProducts = () => {
-        let _products = products.filter(val => !selectedProducts.includes(val));
-        setProducts(_products);
-        setDeleteProductsDialog(false);
-        setSelectedProducts(null);
+        let _products = ambients.filter(val => !selectedAmbient.includes(val));
+        setAmbients(_products);
+        setDeleteAmbientsDialog(false);
+        setSelectedAmbient(null);
         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Products Deleted', life: 3000 });
-    }
-
-    const onCategoryChange = (e) => {
-        let _product = { ...product };
-        _product['category'] = e.value;
-        setAmbient(_product);
     }
 
     const onInputChange = (e, name) => {
         const val = (e.target && e.target.value) || '';
-        let _product = { ...product };
-        _product[`${name}`] = val;
-
-        setAmbient(_product);
-    }
-
-    const onInputNumberChange = (e, name) => {
-        const val = e.value || 0;
-        let _product = { ...product };
+        let _product = { ...ambient };
         _product[`${name}`] = val;
 
         setAmbient(_product);
@@ -199,7 +156,7 @@ function DashboardAmbient() {
         return (
             <React.Fragment>
                 <Button label="Nuevo" icon="pi pi-plus" className="p-button-success mr-2" onClick={openNew} />
-                <Button label="Inactivar" className="p-button-danger" onClick={confirmDeleteSelected} disabled={!selectedProducts || !selectedProducts.length} />
+                <Button label="Inactivar" className="p-button-danger" onClick={confirmDeleteSelected} disabled={!selectedAmbient || !selectedAmbient.length} />
             </React.Fragment>
         )
     }
@@ -256,7 +213,7 @@ function DashboardAmbient() {
 
             <div className="card">
                 <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
-                <DataTable ref={dt} value={products} selection={selectedProducts} onSelectionChange={(e) => setSelectedProducts(e.value)}
+                <DataTable ref={dt} value={ambients} selection={selectedAmbient} onSelectionChange={(e) => setSelectedAmbient(e.value)}
                     dataKey="id" paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} ambientes"
@@ -272,7 +229,7 @@ function DashboardAmbient() {
                 </DataTable>
             </div>
 
-            <Dialog visible={productDialog} style={{ width: '450px' }}
+            <Dialog visible={ambientDialog} style={{ width: '450px' }}
                 header={<img src={logo} alt={"logo"} className="block m-auto pb-0 " />}
                 modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
                 <div className="title-form" style={{ color: "#5EB319", fontWeight: "bold", fontSize: "22px" }}>
@@ -284,21 +241,21 @@ function DashboardAmbient() {
                     <label htmlFor="name">Nombre</label>
                     <InputText
                         id="name"
-                        value={product.name}
+                        value={ambient.name}
                         onChange={(e) => onInputChange(e, 'name')}
                         required autoFocus
-                        className={classNames({ 'p-invalid': submitted && !product.name })} />
-                    {submitted && !product.name && <small className="p-error">Nombre es requerido.</small>}
+                        className={classNames({ 'p-invalid': submitted && !ambient.name })} />
+                    {submitted && !ambient.name && <small className="p-error">Nombre es requerido.</small>}
                 </div>
                 <div className="field">
                     <label htmlFor="location">Ubicación</label>
                     <InputText
                         id="location"
-                        value={product.location}
+                        value={ambient.location}
                         onChange={(e) => onInputChange(e, 'location')}
                         required autoFocus
-                        className={classNames({ 'p-invalid': submitted && !product.location })} />
-                    {submitted && !product.location && <small className="p-error">Ubicación es requerida.</small>}
+                        className={classNames({ 'p-invalid': submitted && !ambient.location })} />
+                    {submitted && !ambient.location && <small className="p-error">Ubicación es requerida.</small>}
                 </div>
                 <div className="field">
                     <label htmlFor="typeEnvironment">Tipo de ambiente</label>
@@ -324,25 +281,25 @@ function DashboardAmbient() {
                     <label htmlFor="ability">Capacidad</label>
                     <InputText
                         id="ability"
-                        value={product.ability}
+                        value={ambient.ability}
                         onChange={(e) => onInputChange(e, 'ability')}
                         required autoFocus
-                        className={classNames({ 'p-invalid': submitted && !product.ability })} />
-                    {submitted && !product.ability && <small className="p-error">Capacidad es requerida.</small>}
+                        className={classNames({ 'p-invalid': submitted && !ambient.ability })} />
+                    {submitted && !ambient.ability && <small className="p-error">Capacidad es requerida.</small>}
                 </div>
             </Dialog>
 
-            <Dialog visible={deleteProductDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductDialogFooter} onHide={hideDeleteProductDialog}>
+            <Dialog visible={deleteAmbientDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductDialogFooter} onHide={hideDeleteProductDialog}>
                 <div className="confirmation-content">
                     <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                    {product && <span>Are you sure you want to delete <b>{product.name}</b>?</span>}
+                    {ambient && <span>Are you sure you want to delete <b>{ambient.name}</b>?</span>}
                 </div>
             </Dialog>
 
-            <Dialog visible={deleteProductsDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductsDialogFooter} onHide={hideDeleteProductsDialog}>
+            <Dialog visible={deleteAmbientsDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductsDialogFooter} onHide={hideDeleteProductsDialog}>
                 <div className="confirmation-content">
                     <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                    {product && <span>Are you sure you want to delete the selected products?</span>}
+                    {ambient && <span>Are you sure you want to delete the selected ambients?</span>}
                 </div>
             </Dialog>
         </div>

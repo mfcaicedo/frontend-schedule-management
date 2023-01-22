@@ -17,12 +17,12 @@ import axios from "axios";
 
 function DashboardProgram() {
 
-    const [products, setProducts] = useState(null);
-    const [productDialog, setProductDialog] = useState(false);
-    const [deleteProductDialog, setDeleteProductDialog] = useState(false);
-    const [deleteProductsDialog, setDeleteProductsDialog] = useState(false);
-    const [product, setProduct] = useState([]);
-    const [selectedProducts, setSelectedProducts] = useState(null);
+    const [programs, setPrograms] = useState(null);
+    const [programDialog, setProgramDialog] = useState(false);
+    const [deleteProgramDialog, setDeleteProgramDialog] = useState(false);
+    const [deleteProgramsDialog, setDeleteProgramsDialog] = useState(false);
+    const [program, setProgram] = useState([]);
+    const [selectedPrograms, setSelectedPrograms] = useState(null);
     const [submitted, setSubmitted] = useState(false);
     const [globalFilter, setGlobalFilter] = useState(null);
     const [selectAcademicPeriod, setSelectAcademicPeriod] = useState(null);
@@ -36,7 +36,7 @@ function DashboardProgram() {
     const loadProgram = () => {
         let baseUrl = "http://localhost:8080/program";
         axios.get(baseUrl).then(response =>
-            setProducts(
+            setPrograms(
                 response.data.map((program) => {
                     return {
                         id: program.id,
@@ -77,138 +77,86 @@ function DashboardProgram() {
     useEffect(() => {
         loadProgram();
         loadAcademicPeriod();
-        // console.log("competence", competence)
-        // console.log("producr", product)
-        // console.log("periodoA", academicPeriod)
     }, []);
 
-
-    // const formatCurrency = (value) => {
-    //     return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-    // }
-
-    console.log("products", product);
+    console.log("programs", program);
 
     const openNew = () => {
-        setProduct(emptyProgram);
+        setProgram(emptyProgram);
         setSubmitted(false);
-        setProductDialog(true);
+        setProgramDialog(true);
     }
 
     const hideDialog = () => {
         setSubmitted(false);
-        setProductDialog(false);
+        setProgramDialog(false);
     }
 
     const hideDeleteProductDialog = () => {
-        setDeleteProductDialog(false);
+        setDeleteProgramDialog(false);
     }
 
     const hideDeleteProductsDialog = () => {
-        setDeleteProductsDialog(false);
+        setDeleteProgramsDialog(false);
     }
 
     const saveProgram = () => {
         setSubmitted(true);
         //completo los campos 
-        console.log("este", product);
-        delete product.id; //elimino el id porque es autoincrementable
+        console.log("este", program);
+        delete program.id; //elimino el id porque es autoincrementable
         //busco el programa seleccionado
-        let selectAcademicPeriod = academicPeriod.find(academicPeriod => academicPeriod.id === product.academicPeriod);
-        product.academicPeriod = selectAcademicPeriod ? selectAcademicPeriod : null;
-        console.log("que paso", product);
-        if (product.name.trim()) {
+        let selectAcademicPeriod = academicPeriod.find(academicPeriod => academicPeriod.id === program.academicPeriod);
+        program.academicPeriod = selectAcademicPeriod ? selectAcademicPeriod : null;
+        console.log("que paso", program);
+        if (program.name.trim()) {
             //hago la peticion a la api para guardar el registro
-            axios.post("http://localhost:8080/program", product)
+            axios.post("http://localhost:8080/program", program)
                 .then(response => {
                     if (response.data != null) {
                         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Programa creado', life: 5000 });
-                        setProductDialog(false);
-                        setProduct(emptyProgram);
+                        setProgramDialog(false);
+                        setProgram(emptyProgram);
                         loadAcademicPeriod();
                     }
                 });
         }
     }
 
-    const editProduct = (product) => {
-        setProduct({ ...product });
-        setProductDialog(true);
-    }
-
-    const confirmDeleteProduct = (product) => {
-        setProduct(product);
-        setDeleteProductDialog(true);
+    const editProduct = (program) => {
+        setProgram({ ...program });
+        setProgramDialog(true);
     }
 
     const deleteProduct = () => {
-        let _products = products.filter(val => val.id !== product.id);
-        setProducts(_products);
-        setDeleteProductDialog(false);
-        setProduct(emptyProgram);
+        let _products = programs.filter(val => val.id !== program.id);
+        setPrograms(_products);
+        setDeleteProgramDialog(false);
+        setProgram(emptyProgram);
         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 3000 });
     }
 
-    const findIndexById = (id) => {
-        let index = -1;
-        for (let i = 0; i < products.length; i++) {
-            if (products[i].id === id) {
-                index = i;
-                break;
-            }
-        }
-
-        return index;
-    }
-
-    const createId = () => {
-        let id = '';
-        let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        for (let i = 0; i < 5; i++) {
-            id += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        return id;
-    }
-
-    // const confirmDeleteSelected = () => {
-    //     setDeleteProductsDialog(true);
-    // }
-
     const deleteSelectedProducts = () => {
-        let _products = products.filter(val => !selectedProducts.includes(val));
-        setProducts(_products);
-        setDeleteProductsDialog(false);
-        setSelectedProducts(null);
+        let _products = programs.filter(val => !selectedPrograms.includes(val));
+        setPrograms(_products);
+        setDeleteProgramsDialog(false);
+        setSelectedPrograms(null);
         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Products Deleted', life: 3000 });
     }
 
-    // const onCategoryChange = (e) => {
-    //     let _product = { ...product };
-    //     _product['category'] = e.value;
-    //     setProduct(_product);
-    // }
-
     const onInputChange = (e, name) => {
         const val = (e.target && e.target.value) || '';
-        let _product = { ...product };
+        let _product = { ...program };
         _product[`${name}`] = val;
 
-        setProduct(_product);
+        setProgram(_product);
     }
-
-    // const onInputNumberChange = (e, name) => {
-    //     const val = e.value || 0;
-    //     let _product = { ...product };
-    //     _product[`${name}`] = val;
-
-    //     setProduct(_product);
-    // }
 
     const leftToolbarTemplate = () => {
         return (
             <React.Fragment>
                 <Button label="Nuevo" icon="pi pi-plus" className="p-button-success mr-2" onClick={openNew} />
-                {/* <Button label="Delete" icon="pi pi-trash" className="p-button-danger" onClick={confirmDeleteSelected} disabled={!selectedProducts || !selectedProducts.length} /> */}
+                {/* <Button label="Delete" icon="pi pi-trash" className="p-button-danger" onClick={confirmDeleteSelected} disabled={!selectedPrograms || !selectedPrograms.length} /> */}
             </React.Fragment>
         )
     }
@@ -266,7 +214,7 @@ function DashboardProgram() {
 
             <div className="card">
                 <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
-                <DataTable ref={dt} value={products} selection={selectedProducts} onSelectionChange={(e) => setSelectedProducts(e.value)}
+                <DataTable ref={dt} value={programs} selection={selectedPrograms} onSelectionChange={(e) => setSelectedPrograms(e.value)}
                     dataKey="id" paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} programas"
@@ -280,7 +228,7 @@ function DashboardProgram() {
                 </DataTable>
             </div>
 
-            <Dialog visible={productDialog} style={{ width: '450px' }}
+            <Dialog visible={programDialog} style={{ width: '450px' }}
                 header={<img src={logo} alt={"logo"} className="block m-auto pb-0 " />}
                 modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
                 <div className="title-form" style={{ color: "#5EB319", fontWeight: "bold", fontSize: "22px" }}>
@@ -293,21 +241,21 @@ function DashboardProgram() {
                     <label htmlFor="code">Código</label>
                     <InputText
                         id="code"
-                        value={product.code}
+                        value={program.code}
                         onChange={(e) => onInputChange(e, 'code')}
                         required autoFocus
-                        className={classNames({ 'p-invalid': submitted && !product.code })} />
-                    {submitted && !product.code && <small className="p-error">Código requerido.</small>}
+                        className={classNames({ 'p-invalid': submitted && !program.code })} />
+                    {submitted && !program.code && <small className="p-error">Código requerido.</small>}
                 </div>
                 <div className="field">
                     <label htmlFor="type">Nombre</label>
                     <InputText
                         id="name"
-                        value={product.name}
+                        value={program.name}
                         onChange={(e) => onInputChange(e, 'name')}
                         required autoFocus
-                        className={classNames({ 'p-invalid': submitted && !product.name })} />
-                    {submitted && !product.name && <small className="p-error">Nombre requerido.</small>}
+                        className={classNames({ 'p-invalid': submitted && !program.name })} />
+                    {submitted && !program.name && <small className="p-error">Nombre requerido.</small>}
                 </div>
                 <div className="field">
                     <label htmlFor="academicPeriod">Periodo Académico</label>
@@ -331,17 +279,17 @@ function DashboardProgram() {
                 </div>
             </Dialog>
 
-            <Dialog visible={deleteProductDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductDialogFooter} onHide={hideDeleteProductDialog}>
+            <Dialog visible={deleteProgramDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductDialogFooter} onHide={hideDeleteProductDialog}>
                 <div className="confirmation-content">
                     <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                    {product && <span>Are you sure you want to delete <b>{product.name}</b>?</span>}
+                    {program && <span>Are you sure you want to delete <b>{program.name}</b>?</span>}
                 </div>
             </Dialog>
 
-            <Dialog visible={deleteProductsDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductsDialogFooter} onHide={hideDeleteProductsDialog}>
+            <Dialog visible={deleteProgramsDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductsDialogFooter} onHide={hideDeleteProductsDialog}>
                 <div className="confirmation-content">
                     <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                    {product && <span>Are you sure you want to delete the selected products?</span>}
+                    {program && <span>Are you sure you want to delete the selected programs?</span>}
                 </div>
             </Dialog>
         </div>
