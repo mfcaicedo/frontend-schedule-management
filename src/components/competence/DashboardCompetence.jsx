@@ -193,11 +193,10 @@ function DashboardCompetence() {
         setDeleteProductDialog(true);
     }
     /**
-     * Metodo para eliminar un registro de la base de datos
+     * Metodo para desactivar una competencia de la base de datos
      */
     const disabledCompetence = () => {
         //desactivo el registro en la base de datos 
-        // axios.put("http://localhost:8080/competence/" + product.id, product)
         axios.patch("http://localhost:8080/competence/disable/" + product.id)
             .then(response => {
                 if (response.data != null) {
@@ -364,14 +363,14 @@ function DashboardCompetence() {
     );
     const competenceDialogFooter = (
         <React.Fragment>
-            <Button label="Cancelar" icon="pi pi-times" className="p-button-text" onClick={hideDialog} />
-            <Button label="Guardar" icon="pi pi-check" className="p-button-text" onClick={saveProduct} />
+            <Button label="Cancelar" icon="pi pi-times" style={{color:"gray"}} className="p-button-text" onClick={hideDialog} />
+            <Button label="Guardar" icon="pi pi-check" style={{color:"#5EB319"}} className="p-button-text" onClick={saveProduct} />
         </React.Fragment>
     );
     const disabledCompentenceDialogFooter = (
         <React.Fragment>
-            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDisabledCompetenceDialog} />
-            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={disabledCompetence} />
+            <Button label="No" icon="pi pi-times" style={{color:"gray"}} className="p-button-text" onClick={hideDisabledCompetenceDialog} />
+            <Button label="Si" icon="pi pi-check" style={{color:"#5EB319"}} className="p-button-text" onClick={disabledCompetence} />
         </React.Fragment>
     );
     const deleteProductsDialogFooter = (
@@ -466,10 +465,10 @@ function DashboardCompetence() {
 
             </Dialog>
 
-            <Dialog visible={disabledCompetenceDialog} style={{ width: '450px' }} header="Desactivar competencia" modal footer={disabledCompentenceDialogFooter} onHide={hideDisabledCompetenceDialog}>
+            <Dialog visible={disabledCompetenceDialog} style={{ width: '450px'}} header="Desactivar competencia" modal footer={disabledCompentenceDialogFooter} onHide={hideDisabledCompetenceDialog}>
                 <div className="confirmation-content">
                     <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                    {product && <span>Are you sure you want to delete <b>{product.name}</b>?</span>}
+                    {product && <span>¿Estás seguro(a) de desactivar la competencia <b>{product.name}</b>?</span>}
                 </div>
             </Dialog>
 
