@@ -2,12 +2,9 @@ import React, { useEffect, useRef, useState } from "react";
 import { classNames } from 'primereact/utils';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-// import { ProductService } from '../service/ProductService';
 import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
-import { FileUpload } from 'primereact/fileupload';
 import { Toolbar } from 'primereact/toolbar';
-import { InputNumber } from 'primereact/inputnumber';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import { Calendar } from 'primereact/calendar';
@@ -18,12 +15,12 @@ import axios from "axios";
 
 function DashboardAcademicPeriod() {
 
-    const [products, setProducts] = useState(null);
-    const [productDialog, setProductDialog] = useState(false);
-    const [deleteProductDialog, setDeleteProductDialog] = useState(false);
-    const [deleteProductsDialog, setDeleteProductsDialog] = useState(false);
-    const [product, setProduct] = useState([]);
-    const [selectedProducts, setSelectedProducts] = useState(null);
+    const [academicPeriods, setAcademicPeriods] = useState(null);
+    const [academicPeriodDialog, setAcademicPeriodDialog] = useState(false);
+    const [deleteAcademicPeriodDialog, setDeleteAcademicPeriodDialog] = useState(false);
+    const [deleteAcademicPeriodsDialog, setDeleteAcademicPeriodsDialog] = useState(false);
+    const [academicPeriod, setAcademicPeriod] = useState([]);
+    const [selectedAcademicPeriods, setSelectedAcademicPeriod] = useState(null);
     const [submitted, setSubmitted] = useState(false);
     const [globalFilter, setGlobalFilter] = useState(null);
     const [selectType, setSelectType] = useState(null);
@@ -43,7 +40,7 @@ function DashboardAcademicPeriod() {
     const loadAcademicPeriod = () => {
         let baseUrl = "http://localhost:8080/academicPeriod";
         axios.get(baseUrl).then(response =>
-            setProducts(
+            setAcademicPeriods(
                 response.data.map((academicPeriod) =>{
                     return{
                         id: academicPeriod.id,
@@ -66,87 +63,87 @@ function DashboardAcademicPeriod() {
 
     useEffect(() => {
         loadAcademicPeriod();
-        console.log("producr", product)
+        console.log("producr", academicPeriod)
 
     }, []);
 
     const openNew = () => {
-        setProduct(emptyAcademicPeriod);
+        setAcademicPeriod(emptyAcademicPeriod);
         setSubmitted(false);
-        setProductDialog(true);
+        setAcademicPeriodDialog(true);
     }
 
     const hideDialog = () => {
         setSubmitted(false);
-        setProductDialog(false);
+        setAcademicPeriodDialog(false);
     }
 
-    const hideDeleteProductDialog = () => {
-        setDeleteProductDialog(false);
+    const hidedeleteAcademicPeriodDialog = () => {
+        setDeleteAcademicPeriodDialog(false);
     }
 
-    const hideDeleteProductsDialog = () => {
-        setDeleteProductsDialog(false);
+    const hidedeleteAcademicPeriodsDialog = () => {
+        setDeleteAcademicPeriodsDialog(false);
     }
 
-    const saveProduct = () => {
+    const saveacademicPeriod = () => {
         setSubmitted(true);
-        console.log("product", product);
+        console.log("academicPeriod", academicPeriod);
         //Fecha inicio
-        let fecha = product.date_init;
+        let fecha = academicPeriod.date_init;
         let dia = fecha.getDate() < 9 ? `0${fecha.getDate()}` : fecha.getDate()
         let mes = fecha.getMonth()+1 < 9 ? `0${fecha.getMonth()+1}` : fecha.getMonth()+1
         let year = fecha.getFullYear()
         let fechaCompletaIni = `${year}-${mes}-${dia}`
-        product.date_init = fechaCompletaIni
+        academicPeriod.date_init = fechaCompletaIni
         //Fecha finalizacion
-        let fechaFin = product.date_end;
+        let fechaFin = academicPeriod.date_end;
         let diaFin = fechaFin.getDate() < 9 ? `0${fechaFin.getDate()}` : fechaFin.getDate()
         let mesFin = fechaFin.getMonth()+1 < 9 ? `0${fechaFin.getMonth()+1}` : fechaFin.getMonth()+1
         let yearFin = fechaFin.getFullYear()
         let fechaCompletaFin = `${yearFin}-${mesFin}-${diaFin}`
-        product.date_end = fechaCompletaFin
+        academicPeriod.date_end = fechaCompletaFin
 
 
-        delete product.id; //elimino el id porque es autoincrementable
+        delete academicPeriod.id; //elimino el id porque es autoincrementable
 
-        if (product.name.trim()) {
+        if (academicPeriod.name.trim()) {
 
             //hago la peticion a la api para guardar el registro
-            axios.post("http://localhost:8080/academicPeriod", product)
+            axios.post("http://localhost:8080/academicPeriod", academicPeriod)
                 .then(response => {
                     if (response.data != null) {
                         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Periodo Académico creado', life: 5000 });
-                        setProductDialog(false);
-                        setProduct(emptyAcademicPeriod);
+                        setAcademicPeriodDialog(false);
+                        setAcademicPeriod(emptyAcademicPeriod);
                         loadAcademicPeriod();
                     }
                 });
         }
     }
 
-    const editProduct = (product) => {
-        setProduct({ ...product });
-        setProductDialog(true);
+    const editacademicPeriod = (academicPeriod) => {
+        setAcademicPeriod({ ...academicPeriod });
+        setAcademicPeriodDialog(true);
     }
 
-    const confirmDeleteProduct = (product) => {
-        setProduct(product);
-        setDeleteProductDialog(true);
+    const confirmDeleteacademicPeriod = (academicPeriod) => {
+        setAcademicPeriod(academicPeriod);
+        setDeleteAcademicPeriodDialog(true);
     }
 
-    const deleteProduct = () => {
-        let _products = products.filter(val => val.id !== product.id);
-        setProducts(_products);
-        setDeleteProductDialog(false);
-        setProduct(emptyAcademicPeriod);
-        toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 3000 });
+    const deleteacademicPeriod = () => {
+        let _academicPeriods = academicPeriods.filter(val => val.id !== academicPeriod.id);
+        setAcademicPeriods(_academicPeriods);
+        setDeleteAcademicPeriodDialog(false);
+        setAcademicPeriod(emptyAcademicPeriod);
+        toast.current.show({ severity: 'success', summary: 'Successful', detail: 'academicPeriod Deleted', life: 3000 });
     }
 
     const findIndexById = (id) => {
         let index = -1;
-        for (let i = 0; i < products.length; i++) {
-            if (products[i].id === id) {
+        for (let i = 0; i < academicPeriods.length; i++) {
+            if (academicPeriods[i].id === id) {
                 index = i;
                 break;
             }
@@ -165,44 +162,44 @@ function DashboardAcademicPeriod() {
     }
 
     const confirmDeleteSelected = () => {
-        setDeleteProductsDialog(true);
+        setDeleteAcademicPeriodsDialog(true);
     }
 
-    const deleteSelectedProducts = () => {
-        let _products = products.filter(val => !selectedProducts.includes(val));
-        setProducts(_products);
-        setDeleteProductsDialog(false);
-        setSelectedProducts(null);
-        toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Products Deleted', life: 3000 });
+    const deleteSelectedacademicPeriods = () => {
+        let _academicPeriods = academicPeriods.filter(val => !selectedAcademicPeriods.includes(val));
+        setAcademicPeriods(_academicPeriods);
+        setDeleteAcademicPeriodsDialog(false);
+        setSelectedAcademicPeriod(null);
+        toast.current.show({ severity: 'success', summary: 'Successful', detail: 'academicPeriods Deleted', life: 3000 });
     }
 
     const onCategoryChange = (e) => {
-        let _product = { ...product };
-        _product['category'] = e.value;
-        setProduct(_product);
+        let _academicPeriod = { ...academicPeriod };
+        _academicPeriod['category'] = e.value;
+        setAcademicPeriod(_academicPeriod);
     }
 
     const onInputChange = (e, name) => {
         const val = (e.target && e.target.value) || '';
-        let _product = { ...product };
-        _product[`${name}`] = val;
+        let _academicPeriod = { ...academicPeriod };
+        _academicPeriod[`${name}`] = val;
 
-        setProduct(_product);
+        setAcademicPeriod(_academicPeriod);
     }
 
     const onInputNumberChange = (e, name) => {
         const val = e.value || 0;
-        let _product = { ...product };
-        _product[`${name}`] = val;
+        let _academicPeriod = { ...academicPeriod };
+        _academicPeriod[`${name}`] = val;
 
-        setProduct(_product);
+        setAcademicPeriod(_academicPeriod);
     }
 
     const leftToolbarTemplate = () => {
         return (
             <React.Fragment>
                 <Button label="Nuevo" icon="pi pi-plus" className="p-button-success mr-2" onClick={openNew} />
-                {/* <Button label="Delete" icon="pi pi-trash" className="p-button-danger" onClick={confirmDeleteSelected} disabled={!selectedProducts || !selectedProducts.length} /> */}
+                {/* <Button label="Delete" icon="pi pi-trash" className="p-button-danger" onClick={confirmDeleteSelected} disabled={!selectedAcademicPeriods || !selectedAcademicPeriods.length} /> */}
             </React.Fragment>
         )
     }
@@ -219,8 +216,8 @@ function DashboardAcademicPeriod() {
     const actionBodyTemplate = (rowData) => {
         return (
             <React.Fragment>
-                <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editProduct(rowData)} />
-                {/* <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDeleteProduct(rowData)} /> */}
+                <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editacademicPeriod(rowData)} />
+                {/* <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDeleteacademicPeriod(rowData)} /> */}
                 <Button label="Programas asociados"/>
             </React.Fragment>
         );
@@ -235,22 +232,22 @@ function DashboardAcademicPeriod() {
             </span>
         </div>
     );
-    const productDialogFooter = (
+    const academicPeriodDialogFooter = (
         <React.Fragment>
             <Button label="Cancelar" icon="pi pi-times" className="p-button-text" style= {{color: "gray"}} onClick={hideDialog} />
-            <Button label="Guardar" icon="pi pi-check" className="p-button-text" style= {{color: "#5EB319"}} onClick={saveProduct} />
+            <Button label="Guardar" icon="pi pi-check" className="p-button-text" style= {{color: "#5EB319"}} onClick={saveacademicPeriod} />
         </React.Fragment>
     );
-    const deleteProductDialogFooter = (
+    const deleteAcademicPeriodDialogFooter = (
         <React.Fragment>
-            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteProductDialog} />
-            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={deleteProduct} />
+            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hidedeleteAcademicPeriodDialog} />
+            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={deleteacademicPeriod} />
         </React.Fragment>
     );
-    const deleteProductsDialogFooter = (
+    const deleteAcademicPeriodsDialogFooter = (
         <React.Fragment>
-            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteProductsDialog} />
-            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={deleteSelectedProducts} />
+            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hidedeleteAcademicPeriodsDialog} />
+            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={deleteSelectedacademicPeriods} />
         </React.Fragment>
     );
 
@@ -260,7 +257,7 @@ function DashboardAcademicPeriod() {
 
             <div className="card">
                 <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
-                <DataTable ref={dt} value={products} selection={selectedProducts} onSelectionChange={(e) => setSelectedProducts(e.value)}
+                <DataTable ref={dt} value={academicPeriods} selection={selectedAcademicPeriods} onSelectionChange={(e) => setSelectedAcademicPeriod(e.value)}
                     dataKey="id" paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} periodos académicos"
@@ -274,9 +271,9 @@ function DashboardAcademicPeriod() {
                 </DataTable>
             </div>
 
-            <Dialog visible={productDialog} style={{ width: '450px' }}
+            <Dialog visible={academicPeriodDialog} style={{ width: '450px' }}
                 header={<img src={logo} alt={"logo"} className="block m-auto pb-0 " />}
-                modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
+                modal className="p-fluid" footer={academicPeriodDialogFooter} onHide={hideDialog}>
                 <div className="title-form" style={{ color: "#5EB319", fontWeight: "bold", fontSize: "22px" }}>
                     <p style={{ marginTop: "0px" }}>
                         Crear Periodo Académico
@@ -286,11 +283,11 @@ function DashboardAcademicPeriod() {
                     <label htmlFor="name">Nombre</label>
                     <InputText
                         id="name"
-                        value={product.name}
+                        value={academicPeriod.name}
                         onChange={(e) => onInputChange(e, 'name')}
                         required autoFocus
-                        className={classNames({ 'p-invalid': submitted && !product.name })} />
-                    {submitted && !product.name && <small className="p-error">Nombre requerido.</small>}
+                        className={classNames({ 'p-invalid': submitted && !academicPeriod.name })} />
+                    {submitted && !academicPeriod.name && <small className="p-error">Nombre requerido.</small>}
                 </div>
                 
                 <div className="field">
@@ -313,17 +310,17 @@ function DashboardAcademicPeriod() {
 
             </Dialog>
 
-            <Dialog visible={deleteProductDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductDialogFooter} onHide={hideDeleteProductDialog}>
+            <Dialog visible={deleteAcademicPeriodDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteAcademicPeriodDialogFooter} onHide={hidedeleteAcademicPeriodDialog}>
                 <div className="confirmation-content">
                     <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                    {product && <span>Are you sure you want to delete <b>{product.name}</b>?</span>}
+                    {academicPeriod && <span>Are you sure you want to delete <b>{academicPeriod.name}</b>?</span>}
                 </div>
             </Dialog>
 
-            <Dialog visible={deleteProductsDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductsDialogFooter} onHide={hideDeleteProductsDialog}>
+            <Dialog visible={deleteAcademicPeriodsDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteAcademicPeriodsDialogFooter} onHide={hidedeleteAcademicPeriodsDialog}>
                 <div className="confirmation-content">
                     <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                    {product && <span>Are you sure you want to delete the selected products?</span>}
+                    {academicPeriod && <span>Are you sure you want to delete the selected academicPeriods?</span>}
                 </div>
             </Dialog>
         </div>
