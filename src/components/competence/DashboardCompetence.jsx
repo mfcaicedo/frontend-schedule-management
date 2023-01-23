@@ -2,18 +2,11 @@ import React, { useEffect, useRef, useState } from "react";
 import { classNames } from 'primereact/utils';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-// import { ProductService } from '../service/ProductService';
 import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
-import { FileUpload } from 'primereact/fileupload';
-import { Rating } from 'primereact/rating';
 import { Toolbar } from 'primereact/toolbar';
-import { InputTextarea } from 'primereact/inputtextarea';
-import { RadioButton } from 'primereact/radiobutton';
-import { InputNumber } from 'primereact/inputnumber';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
-import { CascadeSelect } from 'primereact/cascadeselect';
 import { Dropdown } from 'primereact/dropdown';
 import logo from '../../assets/img/logo.png';
 import '../../App.css';
@@ -22,13 +15,13 @@ import axios from "axios";
 
 function DashboardCompetence() {
 
-    const [competence, setCompetence] = useState([]);
+    //const [competence, setCompetence] = useState([]);
     const [competences, setCompetences] = useState([]);
-    const [productDialog, setProductDialog] = useState(false);
+    const [competenceDialog, setCompetenceDialog] = useState(false);
     const [disabledCompetenceDialog, setDisabledCompetenceDialog] = useState(false);
     const [disabledCompetencesDialog, setDisabledCompetencesDialog] = useState(false);
-    const [product, setProduct] = useState([]);
-    const [selectedProducts, setSelectedProducts] = useState(null);
+    const [competence, setCompetence] = useState([]);
+    const [selectedCompetences, setSelectedCompetences] = useState(null);
     const [submitted, setSubmitted] = useState(false);
     const [globalFilter, setGlobalFilter] = useState(null);
     const [selectType, setSelectType] = useState(null);
@@ -125,38 +118,38 @@ function DashboardCompetence() {
     }
 
     const openNew = () => {
-        setProduct(emptyCompetence);
+        setCompetence(emptyCompetence);
         setSubmitted(false);
-        setProductDialog(true);
+        setCompetenceDialog(true);
     }
 
     const hideDialog = () => {
         setSubmitted(false);
-        setProductDialog(false);
+        setCompetenceDialog(false);
     }
 
     const hideDisabledCompetenceDialog = () => {
         setDisabledCompetenceDialog(false);
     }
 
-    const hideDeleteProductsDialog = () => {
+    const hideDeleteCompetencesDialog = () => {
         setDisabledCompetencesDialog(false);
     }
 
-    const saveProduct = () => {
+    const saveCompetence = () => {
         setSubmitted(true);
         //completo los campos 
-        console.log("este ver", product);
-        product.state = 'Activo';
+        console.log("este ver", competence);
+        competence.state = 'Activo';
         //busco el programa seleccionado
-        let selectProgram = program.find(program => program.id === product.program_id);
-        product.program = selectProgram ? selectProgram : null;
+        let selectProgram = program.find(program => program.id === competence.program_id);
+        competence.program = selectProgram ? selectProgram : null;
         //armo el objeto para guardarlo en la db posteriormente
         let competenceSave = {
-            name: product.name,
-            program: product.program,
-            state: product.state,
-            type: product.type,
+            name: competence.name,
+            program: competence.program,
+            state: competence.state,
+            type: competence.type,
         }
         console.log("que paso", competenceSave);
         if (!isEdit) {
@@ -167,53 +160,53 @@ function DashboardCompetence() {
                 .then(response => {
                     if (response.data != null) {
                         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Competencia creada', life: 5000 });
-                        setProductDialog(false);
-                        setProduct(emptyCompetence);
+                        setCompetenceDialog(false);
+                        setCompetence(emptyCompetence);
                         loadCompetence();
                     } else {
                         toast.current.show({
                             severity: 'error', summary: 'Error', detail: 'Ocurrió un error, por favor vuelve a intentarlo'
                             , life: 5000
                         });
-                        setProductDialog(false);
-                        setProduct(emptyCompetence);
+                        setCompetenceDialog(false);
+                        setCompetence(emptyCompetence);
                     }
                 });
         } else {
-            console.log(product.id)
+            console.log(competence.id)
             console.log('competence', competenceSave)
             // return 0; 
             //hago la peticion a la api para que guarde la competencia editada 
-            axios.patch("http://localhost:8080/competence/" + product.id, competenceSave)
+            axios.patch("http://localhost:8080/competence/" + competence.id, competenceSave)
                 .then(response => {
                     if (response.data != null) {
                         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Competencia actualizada', life: 5000 });
-                        setProductDialog(false);
-                        setProduct(emptyCompetence);
+                        setCompetenceDialog(false);
+                        setCompetence(emptyCompetence);
                         loadCompetence();
                     } else {
                         toast.current.show({
                             severity: 'error', summary: 'Error', detail: 'Ocurrió un error, por favor vuelve a intentarlo'
                             , life: 5000
                         });
-                        setProductDialog(false);
-                        setProduct(emptyCompetence);
+                        setCompetenceDialog(false);
+                        setCompetence(emptyCompetence);
                     }
                 });
         }
     }
     /**
      * Metodo que me muestra el dialog para editar una competencia y actualizarla en la base de datos
-     * @param {*} product competencia a editar
+     * @param {*} competence competencia a editar
      */
-    const editProduct = (product) => {
-        setProduct({ ...product });
-        setProductDialog(true);
+    const editCompetence = (competence) => {
+        setCompetence({ ...competence });
+        setCompetenceDialog(true);
         setIsEdit(true);
     }
 
-    const confirmDeleteProduct = (product) => {
-        setProduct(product);
+    const confirmDeleteCompetence = (competence) => {
+        setCompetence(competence);
         setDisabledCompetenceDialog(true);
     }
     /**
@@ -221,12 +214,12 @@ function DashboardCompetence() {
      */
     const disabledCompetence = () => {
         //desactivo el registro en la base de datos 
-        axios.patch("http://localhost:8080/competence/disable/" + product.id)
+        axios.patch("http://localhost:8080/competence/disable/" + competence.id)
             .then(response => {
                 if (response.data != null) {
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Competencia desactivada', life: 5000 });
                     setDisabledCompetenceDialog(false);
-                    setProduct(emptyCompetence);
+                    setCompetence(emptyCompetence);
                     loadCompetence();
                 }
             });
@@ -252,74 +245,38 @@ function DashboardCompetence() {
         return id;
     }
 
-    const importCSV = (e) => {
-        const file = e.files[0];
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const csv = e.target.result;
-            const data = csv.split('\n');
-
-            // Prepare DataTable
-            const cols = data[0].replace(/['"]+/g, '').split(',');
-            data.shift();
-
-            const importedData = data.map(d => {
-                d = d.split(',');
-                const processedData = cols.reduce((obj, c, i) => {
-                    c = c === 'Status' ? 'inventoryStatus' : (c === 'Reviews' ? 'rating' : c.toLowerCase());
-                    obj[c] = d[i].replace(/['"]+/g, '');
-                    (c === 'price' || c === 'rating') && (obj[c] = parseFloat(obj[c]));
-                    return obj;
-                }, {});
-
-                processedData['id'] = createId();
-                return processedData;
-            });
-
-            const _products = [...competences, ...importedData];
-
-            setCompetences(_products);
-        };
-
-        reader.readAsText(file, 'UTF-8');
-    }
-
-    const exportCSV = () => {
-        dt.current.exportCSV();
-    }
-
     const confirmDeleteSelected = () => {
         setDisabledCompetencesDialog(true);
     }
 
-    const deleteSelectedProducts = () => {
-        let _products = competences.filter(val => !selectedProducts.includes(val));
-        setCompetences(_products);
+    const deleteSelectedCompetences = () => {
+        let _competences = competences.filter(val => !selectedCompetences.includes(val));
+        setCompetences(_competences);
         setDisabledCompetencesDialog(false);
-        setSelectedProducts(null);
+        setSelectedCompetences(null);
         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Competencias desactivadas', life: 5000 });
     }
 
     const onCategoryChange = (e) => {
-        let _product = { ...product };
-        _product['category'] = e.value;
-        setProduct(_product);
+        let _competence = { ...competence };
+        _competence['category'] = e.value;
+        setCompetence(_competence);
     }
 
     const onInputChange = (e, name) => {
         const val = (e.target && e.target.value) || '';
-        let _product = { ...product };
-        _product[`${name}`] = val;
+        let _competence = { ...competence };
+        _competence[`${name}`] = val;
 
-        setProduct(_product);
+        setCompetence(_competence);
     }
 
     const onInputNumberChange = (e, name) => {
         const val = e.value || 0;
-        let _product = { ...product };
-        _product[`${name}`] = val;
+        let _competence = { ...competence };
+        _competence[`${name}`] = val;
 
-        setProduct(_product);
+        setCompetence(_competence);
     }
 
     const leftToolbarTemplate = () => {
@@ -329,7 +286,7 @@ function DashboardCompetence() {
                     openNew()
                     setIsEdit(false)
                 }} />
-                {/* <Button label="Delete" icon="pi pi-trash" className="p-button-danger" onClick={confirmDeleteSelected} disabled={!selectedProducts || !selectedProducts.length} /> */}
+                {/* <Button label="Delete" icon="pi pi-trash" className="p-button-danger" onClick={confirmDeleteSelected} disabled={!selectedCompetences || !selectedCompetences.length} /> */}
             </React.Fragment>
         )
     }
@@ -337,26 +294,10 @@ function DashboardCompetence() {
     const rightToolbarTemplate = () => {
         return (
             <React.Fragment>
-                <FileUpload mode="basic" name="demo[]" auto url="https://primefaces.org/primereact/showcase/upload.php" accept=".csv" chooseLabel="Import" className="mr-2 inline-block" onUpload={importCSV} />
-                <Button label="Export" icon="pi pi-upload" className="p-button-help" onClick={exportCSV} />
+                {/* <FileUpload mode="basic" name="demo[]" auto url="https://primefaces.org/primereact/showcase/upload.php" accept=".csv" chooseLabel="Import" className="mr-2 inline-block" onUpload={importCSV} />
+                <Button label="Export" icon="pi pi-upload" className="p-button-help" onClick={exportCSV} /> */}
             </React.Fragment>
         )
-    }
-
-    const imageBodyTemplate = (rowData) => {
-        return <img src={`images/product/${rowData.image}`} onError={(e) => e.target.src = 'https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png'} alt={rowData.image} className="product-image" />
-    }
-
-    const priceBodyTemplate = (rowData) => {
-        return formatCurrency(rowData.price);
-    }
-
-    const ratingBodyTemplate = (rowData) => {
-        return <Rating value={rowData.rating} readOnly cancel={false} />;
-    }
-
-    const statusBodyTemplate = (rowData) => {
-        return <span className={`product-badge status-${rowData.inventoryStatus.toLowerCase()}`}>{rowData.inventoryStatus}</span>;
     }
 
     /**
@@ -367,15 +308,15 @@ function DashboardCompetence() {
     const actionBodyTemplate = (rowData) => {
         return (
             <React.Fragment>
-                <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editProduct(rowData)} />
-                <Button icon="pi pi-eye-slash" className="p-button-rounded p-button-warning" onClick={() => confirmDeleteProduct(rowData)} />
+                <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editCompetence(rowData)} />
+                <Button icon="pi pi-eye-slash" className="p-button-rounded p-button-warning" onClick={() => confirmDeleteCompetence(rowData)} />
             </React.Fragment>
         );
     }
 
     const header = (
         <div className="table-header">
-            <h5 className="mx-0 my-1">Manage Products</h5>
+            <h5 className="mx-0 my-1">Competencias</h5>
             <span className="p-input-icon-left">
                 <i className="pi pi-search" />
                 <InputText type="search" onInput={(e) => setGlobalFilter(e.target.value)} placeholder="Search..." />
@@ -385,7 +326,7 @@ function DashboardCompetence() {
     const competenceDialogFooter = (
         <React.Fragment>
             <Button label="Cancelar" icon="pi pi-times" style={{ color: "gray" }} className="p-button-text" onClick={hideDialog} />
-            <Button label="Guardar" icon="pi pi-check" style={{ color: "#5EB319" }} className="p-button-text" onClick={saveProduct} />
+            <Button label="Guardar" icon="pi pi-check" style={{ color: "#5EB319" }} className="p-button-text" onClick={saveCompetence} />
         </React.Fragment>
     );
     const disabledCompentenceDialogFooter = (
@@ -394,10 +335,10 @@ function DashboardCompetence() {
             <Button label="Si" icon="pi pi-check" style={{ color: "#5EB319" }} className="p-button-text" onClick={disabledCompetence} />
         </React.Fragment>
     );
-    const deleteProductsDialogFooter = (
+    const deleteCompetencesDialogFooter = (
         <React.Fragment>
-            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteProductsDialog} />
-            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={deleteSelectedProducts} />
+            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteCompetencesDialog} />
+            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={deleteSelectedCompetences} />
         </React.Fragment>
     );
 
@@ -407,7 +348,7 @@ function DashboardCompetence() {
 
             <div className="card">
                 <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
-                <DataTable ref={dt} value={competences} selection={selectedProducts} onSelectionChange={(e) => setSelectedProducts(e.value)}
+                <DataTable ref={dt} value={competences} selection={selectedCompetences} onSelectionChange={(e) => setSelectedCompetences(e.value)}
                     dataKey="id" paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} competences"
@@ -424,7 +365,7 @@ function DashboardCompetence() {
                 </DataTable>
             </div>
 
-            <Dialog visible={productDialog} style={{ width: '450px' }}
+            <Dialog visible={competenceDialog} style={{ width: '450px' }}
                 header={<img src={logo} alt={"logo"} className="block m-auto pb-0 " />}
                 modal className="p-fluid" footer={competenceDialogFooter} onHide={hideDialog}>
                 <div className="title-form" style={{ color: "#5EB319", fontWeight: "bold", fontSize: "22px" }}>
@@ -437,11 +378,11 @@ function DashboardCompetence() {
                     <label htmlFor="name">Nombre</label>
                     <InputText
                         id="name"
-                        value={product.name}
+                        value={competence.name}
                         onChange={(e) => onInputChange(e, 'name')}
                         required autoFocus
-                        className={classNames({ 'p-invalid': submitted && !product.name })} />
-                    {submitted && !product.name && <small className="p-error">El nombre es requerido</small>}
+                        className={classNames({ 'p-invalid': submitted && !competence.name })} />
+                    {submitted && !competence.name && <small className="p-error">El nombre es requerido</small>}
                 </div>
                 <div className="field">
                     <label htmlFor="type">Tipo</label>
@@ -453,7 +394,7 @@ function DashboardCompetence() {
 
                         }}
                         name="type"
-                        value={product.type}
+                        value={competence.type}
                         options={typeOptions}
                         onChange={(e) => {
                             setSelectType(e.value)
@@ -473,7 +414,7 @@ function DashboardCompetence() {
 
                         }}
                         name="program"
-                        value={product.program_id}
+                        value={competence.program_id}
                         options={optionsProgram}
                         onChange={(e) => {
                             setSelectProgram(e.value)
@@ -490,14 +431,14 @@ function DashboardCompetence() {
             <Dialog visible={disabledCompetenceDialog} style={{ width: '450px' }} header="Desactivar competencia" modal footer={disabledCompentenceDialogFooter} onHide={hideDisabledCompetenceDialog}>
                 <div className="confirmation-content">
                     <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                    {product && <span>¿Estás seguro(a) de desactivar la competencia <b>{product.name}</b>?</span>}
+                    {competence && <span>¿Estás seguro(a) de desactivar la competencia <b>{competence.name}</b>?</span>}
                 </div>
             </Dialog>
 
-            <Dialog visible={disabledCompetencesDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductsDialogFooter} onHide={hideDeleteProductsDialog}>
+            <Dialog visible={disabledCompetencesDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteCompetencesDialogFooter} onHide={hideDeleteCompetencesDialog}>
                 <div className="confirmation-content">
                     <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                    {product && <span>Are you sure you want to delete the selected competences?</span>}
+                    {competence && <span>Are you sure you want to delete the selected competences?</span>}
                 </div>
             </Dialog>
         </div>

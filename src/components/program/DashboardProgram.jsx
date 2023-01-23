@@ -28,6 +28,8 @@ function DashboardProgram() {
     const [selectAcademicPeriod, setSelectAcademicPeriod] = useState(null);
     const [academicPeriod, setAcademicPeriod] = useState([]);
     const [academicPeriodOptions, setAcademicPeriodOptions] = useState(null);
+     //Se declara un estado para controlar cuando se edita o se crea una competencia
+     const [isEdit, setIsEdit] = useState(false);
 
     //Referencias 
     const toast = useRef(null);
@@ -42,7 +44,8 @@ function DashboardProgram() {
                         id: program.id,
                         code: program.code,
                         name: program.name,
-                        academic_period_id: program.academic_period_id
+                        academicPeriod: program.academicPeriod ? program.academicPeriod.name : null,
+                        academic_period_id: program.academicPeriod ? program.academicPeriod.id : null 
                     }
                 })
             )
@@ -79,7 +82,7 @@ function DashboardProgram() {
         loadAcademicPeriod();
     }, []);
 
-    console.log("programs", program);
+    //console.log("programs", program);
 
     const openNew = () => {
         setProgram(emptyProgram);
@@ -104,28 +107,62 @@ function DashboardProgram() {
         setSubmitted(true);
         //completo los campos 
         console.log("este", program);
-        delete program.id; //elimino el id porque es autoincrementable
         //busco el programa seleccionado
-        let selectAcademicPeriod = academicPeriod.find(academicPeriod => academicPeriod.id === program.academicPeriod);
+        let selectAcademicPeriod = academicPeriod.find(academicPeriod => academicPeriod.id === program.academic_period_id);
         program.academicPeriod = selectAcademicPeriod ? selectAcademicPeriod : null;
+
+        let programSave = {
+            code: program.code,
+            name: program.name,
+            academicPeriod: program.academicPeriod
+        }
         console.log("que paso", program);
-        if (program.name.trim()) {
+        if (!isEdit) {
+            console.log("crear")
             //hago la peticion a la api para guardar el registro
-            axios.post("http://localhost:8080/program", program)
+            axios.post("http://localhost:8080/program", programSave)
                 .then(response => {
                     if (response.data != null) {
                         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Programa creado', life: 5000 });
                         setProgramDialog(false);
                         setProgram(emptyProgram);
                         loadAcademicPeriod();
+                    }else{
+                        toast.current.show({
+                            severity: 'error', summary: 'Error', detail: 'Ocurrió unerror, por favor vuelve a intentarlo', life: 5000
+                        });
+                        setProgramDialog(false);
+                        setProgram(emptyProgram);
                     }
                 });
+        }else{
+            console.log(program.id)
+            console.log('program', programSave)
+            //return 0
+            //hago la peticion a la api para que guarde la competencia editada 
+            axios.patch("http://localhost:8080/program/" + program.id, programSave)
+            .then(response => {
+                if (response.data != null) {
+                    toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Programa actualizado', life: 5000 });
+                    setProgramDialog(false);
+                    setProgram(emptyProgram);
+                    loadProgram();
+                } else {
+                    toast.current.show({
+                        severity: 'error', summary: 'Error', detail: 'Ocurrió un error, por favor vuelve a intentarlo'
+                        , life: 5000
+                    });
+                    setProgramDialog(false);
+                    setProgram(emptyProgram);
+                }
+            });
         }
     }
 
     const editProduct = (program) => {
         setProgram({ ...program });
         setProgramDialog(true);
+        setIsEdit(true);
     }
 
     const deleteProduct = () => {
@@ -155,7 +192,10 @@ function DashboardProgram() {
     const leftToolbarTemplate = () => {
         return (
             <React.Fragment>
-                <Button label="Nuevo" icon="pi pi-plus" className="p-button-success mr-2" onClick={openNew} />
+                <Button label="Nuevo programa" icon="pi pi-plus" className="p-button-success mr-2" onClick={(e) =>{
+                    openNew()
+                    setIsEdit(false)
+                }} />
                 {/* <Button label="Delete" icon="pi pi-trash" className="p-button-danger" onClick={confirmDeleteSelected} disabled={!selectedPrograms || !selectedPrograms.length} /> */}
             </React.Fragment>
         )
@@ -189,13 +229,13 @@ function DashboardProgram() {
             </span>
         </div>
     );
-    const productDialogFooter = (
+    const programDialogFooter = (
         <React.Fragment>
             <Button label="Cancelar" icon="pi pi-times" className="p-button-text" style={{ color: "gray" }} onClick={hideDialog} />
             <Button label="Guardar" icon="pi pi-check" className="p-button-text" style={{ color: "#5EB319" }} onClick={saveProgram} />
         </React.Fragment>
     );
-    const deleteProductDialogFooter = (
+    const deleteProgramDialogFooter = (
         <React.Fragment>
             <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteProductDialog} />
             <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={deleteProduct} />
@@ -230,7 +270,7 @@ function DashboardProgram() {
 
             <Dialog visible={programDialog} style={{ width: '450px' }}
                 header={<img src={logo} alt={"logo"} className="block m-auto pb-0 " />}
-                modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
+                modal className="p-fluid" footer={programDialogFooter} onHide={hideDialog}>
                 <div className="title-form" style={{ color: "#5EB319", fontWeight: "bold", fontSize: "22px" }}>
                     <p style={{ marginTop: "0px" }}>
                         Crear Programa
@@ -267,11 +307,12 @@ function DashboardProgram() {
 
                         }}
                         name="academicPeriod"
-                        value={selectAcademicPeriod}
+                        value={program.academic_period_id}
                         options={academicPeriodOptions}
                         onChange={(e) => {
                             setSelectAcademicPeriod(e.value)
                             onInputChange(e, 'academicPeriod')
+                            onInputChange(e, "academic_period_id")
                         }}
                         optionLabel="label"
                         placeholder="Seleccione periodo académico"
@@ -279,7 +320,7 @@ function DashboardProgram() {
                 </div>
             </Dialog>
 
-            <Dialog visible={deleteProgramDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductDialogFooter} onHide={hideDeleteProductDialog}>
+            <Dialog visible={deleteProgramDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProgramDialogFooter} onHide={hideDeleteProductDialog}>
                 <div className="confirmation-content">
                     <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
                     {program && <span>Are you sure you want to delete <b>{program.name}</b>?</span>}

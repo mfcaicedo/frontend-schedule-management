@@ -198,7 +198,7 @@ function DashboardAcademicPeriod() {
     const leftToolbarTemplate = () => {
         return (
             <React.Fragment>
-                <Button label="Nuevo" icon="pi pi-plus" className="p-button-success mr-2" onClick={openNew} />
+                <Button label="Nuevo periodo académico" icon="pi pi-plus" className="p-button-success mr-2" onClick={openNew} />
                 {/* <Button label="Delete" icon="pi pi-trash" className="p-button-danger" onClick={confirmDeleteSelected} disabled={!selectedAcademicPeriods || !selectedAcademicPeriods.length} /> */}
             </React.Fragment>
         )
