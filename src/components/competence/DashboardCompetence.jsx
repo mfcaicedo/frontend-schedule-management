@@ -35,6 +35,8 @@ function DashboardCompetence() {
     const [selectProgram, setSelectProgram] = useState(null);
     const [program, setProgram] = useState(new Array());
     const [optionsProgram, setOptionsProgram] = useState([]);
+    //Se declara un estado para controlar cuando se edita o se crea una competencia
+    const [isEdit, setIsEdit] = useState(false);
 
     //Referencias
     const toast = useRef(null);
@@ -53,10 +55,12 @@ function DashboardCompetence() {
                         name: competence.name,
                         type: competence.type,
                         state: competence.state,
-                        program_id: competence.program_id
+                        program: competence.program ? competence.program.name : null, 
+                        program_id: competence.program ? competence.program.id : null
                     }
                 })
             )
+            console.log("las competencias", response.data)
         }
         );
     };
@@ -96,11 +100,11 @@ function DashboardCompetence() {
     const typeOptions = [
         {
             label: 'Genérica',
-            input: 'Generica'
+            value: 'Generica'
         },
         {
             label: 'Específica',
-            input: 'Especifica'
+            value: 'Especifica'
         }
     ];
 
@@ -137,55 +141,66 @@ function DashboardCompetence() {
     const saveProduct = () => {
         setSubmitted(true);
         //completo los campos 
-        console.log("este", product);
+        console.log("este ver", product);
         product.state = 'Activo';
-        product.type = product.type.input;
-        delete product.id; //elimino el id porque es autoincrementable
         //busco el programa seleccionado
-        let selectProgram = program.find(program => program.id === product.program);
+        let selectProgram = program.find(program => program.id === product.program_id);
         product.program = selectProgram ? selectProgram : null;
-        console.log("que paso", product);
-        // return 0 ; 
-        if (product.name.trim()) {
+        //armo el objeto para guardarlo en la db posteriormente
+        let competenceSave = {
+            name: product.name,
+            program: product.program,
+            state: product.state, 
+            type: product.type,
+        }
+        console.log("que paso", competenceSave);
+        if (!isEdit) {
+            console.log("crear");
+            return 0 ; 
             //hago la peticion a la api para guardar el registro
-            axios.post("http://localhost:8080/competence", product)
+            axios.post("http://localhost:8080/competence", competenceSave)
                 .then(response => {
                     if (response.data != null) {
                         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Competencia creada', life: 5000 });
                         setProductDialog(false);
                         setProduct(emptyCompetence);
                         loadCompetence();
+                    }else{
+                        toast.current.show({ severity: 'error', summary: 'Error', detail: 'Ocurrió un error, por favor vuelve a intentarlo'
+                        , life: 5000 });
+                        setProductDialog(false);
+                        setProduct(emptyCompetence);
+                    }
+                });
+        }else{
+            console.log(product.id)
+            console.log('competence', competenceSave)
+            // return 0; 
+            //hago la peticion a la api para que guarde la competencia editada 
+            axios.patch("http://localhost:8080/competence/" + product.id, competenceSave)
+                .then(response => {
+                    if (response.data != null) {
+                        toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Competencia actualizada', life: 5000 });
+                        setProductDialog(false);
+                        setProduct(emptyCompetence);
+                        loadCompetence();
+                    }else{
+                        toast.current.show({ severity: 'error', summary: 'Error', detail: 'Ocurrió un error, por favor vuelve a intentarlo'
+                        , life: 5000 });
+                        setProductDialog(false);
+                        setProduct(emptyCompetence);
                     }
                 });
         }
-
-        // return 0; 
-
-        // if (product.name.trim()) {
-        //     let _products = [...competences];
-        //     let _product = { ...product };
-        //     if (product.id) {
-        //         const index = findIndexById(product.id);
-
-        //         _products[index] = _product;
-        //         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Updated', life: 3000 });
-        //     }
-        //     else {
-        //         _product.id = createId();
-        //         _product.image = 'product-placeholder.svg';
-        //         _products.push(_product);
-        //         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
-        //     }
-
-        //     setCompetences(_products);
-        //     setProductDialog(false);
-        //     setProduct(emptyCompetence);
-        // }
     }
-
+    /**
+     * Metodo que me muestra el dialog para editar una competencia y actualizarla en la base de datos
+     * @param {*} product competencia a editar
+     */
     const editProduct = (product) => {
         setProduct({ ...product });
         setProductDialog(true);
+        setIsEdit(true);
     }
 
     const confirmDeleteProduct = (product) => {
@@ -206,11 +221,6 @@ function DashboardCompetence() {
                     loadCompetence();
                 }
             });
-        // let _products = competences.filter(val => val.id !== product.id);
-        // setCompetences(_products);
-        // setDeleteProductDialog(false);
-        // setProduct(emptyCompetence);
-        // toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Competencia desactivda', life: 5000 });
     }
 
     const findIndexById = (id) => {
@@ -221,7 +231,6 @@ function DashboardCompetence() {
                 break;
             }
         }
-
         return index;
     }
 
@@ -307,8 +316,11 @@ function DashboardCompetence() {
     const leftToolbarTemplate = () => {
         return (
             <React.Fragment>
-                <Button label="New" icon="pi pi-plus" className="p-button-success mr-2" onClick={openNew} />
-                <Button label="Delete" icon="pi pi-trash" className="p-button-danger" onClick={confirmDeleteSelected} disabled={!selectedProducts || !selectedProducts.length} />
+                <Button label="Nueva competencia" icon="pi pi-plus" className="p-button-success mr-2" onClick={(e) => {
+                    openNew()
+                    setIsEdit(false)
+                    }} />
+                {/* <Button label="Delete" icon="pi pi-trash" className="p-button-danger" onClick={confirmDeleteSelected} disabled={!selectedProducts || !selectedProducts.length} /> */}
             </React.Fragment>
         )
     }
@@ -420,7 +432,7 @@ function DashboardCompetence() {
                         onChange={(e) => onInputChange(e, 'name')}
                         required autoFocus
                         className={classNames({ 'p-invalid': submitted && !product.name })} />
-                    {submitted && !product.name && <small className="p-error">Name is required.</small>}
+                    {submitted && !product.name && <small className="p-error">El nombre es requerido</small>}
                 </div>
                 <div className="field">
                     <label htmlFor="type">Tipo</label>
@@ -432,7 +444,7 @@ function DashboardCompetence() {
 
                         }}
                         name="type"
-                        value={selectType}
+                        value={product.type}
                         options={typeOptions}
                         onChange={(e) => {
                             setSelectType(e.value)
@@ -440,7 +452,7 @@ function DashboardCompetence() {
                         }}
                         optionLabel="label"
                         placeholder="Seleccione tipo"
-                    />
+                        />
                 </div>
                 <div className="field">
                     <label htmlFor="program">Seleccione programa al que pertenece</label>
@@ -452,11 +464,12 @@ function DashboardCompetence() {
 
                         }}
                         name="program"
-                        value={selectProgram}
+                        value={product.program_id}
                         options={optionsProgram}
                         onChange={(e) => {
                             setSelectProgram(e.value)
                             onInputChange(e, 'program')
+                            onInputChange(e, "program_id")
                         }}
                         optionLabel="label"
                         placeholder="Seleccione programa"
