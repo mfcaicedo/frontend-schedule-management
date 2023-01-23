@@ -17,8 +17,8 @@ function DashboardAmbient() {
 
     const [ambients, setAmbients] = useState(null);
     const [ambientDialog, setAmbientDialog] = useState(false);
-    const [deleteAmbientDialog, setDeleteAmbientDialog] = useState(false);
-    const [deleteAmbientsDialog, setDeleteAmbientsDialog] = useState(false);
+    const [disabledAmbientDialog, setDisabledAmbientDialog] = useState(false);
+    const [disabledAmbientsDialog, setDisabledAmbientsDialog] = useState(false);
     const [ambient, setAmbient] = useState([]);
     const [selectedAmbient, setSelectedAmbient] = useState(null);
     const [submitted, setSubmitted] = useState(false);
@@ -86,12 +86,12 @@ function DashboardAmbient() {
         setAmbientDialog(false);
     }
 
-    const hideDeleteProductDialog = () => {
-        setDeleteAmbientDialog(false);
+    const hideDisabledAmbientDialog = () => {
+        setDisabledAmbientDialog(false);
     }
 
-    const hideDeleteProductsDialog = () => {
-        setDeleteAmbientsDialog(false);
+    const hideDisabledAmbientsDialog = () => {
+        setDisabledAmbientsDialog(false);
     }
 
     const saveAmbient = () => {
@@ -119,27 +119,35 @@ function DashboardAmbient() {
         setAmbientDialog(true);
     }
 
-    const confirmDeleteProduct = (ambient) => {
+    const confirmDisabledAmbient = (ambient) => {
         setAmbient(ambient);
-        setDeleteAmbientDialog(true);
+        setDisabledAmbientDialog(true);
     }
 
-    const deleteProduct = () => {
-        let _products = ambients.filter(val => val.id !== ambient.id);
-        setAmbients(_products);
-        setDeleteAmbientDialog(false);
-        setAmbient(emptyAmbient);
-        toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 3000 });
+    /**
+    * Metodo para desactivar una competencia de la base de datos
+    */
+    const disabledAmbient = () => {
+        //desactivo el registro en la base de datos 
+        axios.patch("http://localhost:8080/ambient/disable/" + ambient.id)
+            .then(response => {
+                if (response.data != null) {
+                    toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Ambiente desactivado', life: 5000 });
+                    setDisabledAmbientDialog(false);
+                    setAmbient(emptyAmbient);
+                    loadAmbient();
+                }
+            });
     }
 
-    const confirmDeleteSelected = () => {
-        setDeleteAmbientsDialog(true);
+    const confirmDisabledSelected = () => {
+        setDisabledAmbientsDialog(true);
     }
 
-    const deleteSelectedProducts = () => {
+    const disabledSelectedAmbients = () => {
         let _products = ambients.filter(val => !selectedAmbient.includes(val));
         setAmbients(_products);
-        setDeleteAmbientsDialog(false);
+        setDisabledAmbientsDialog(false);
         setSelectedAmbient(null);
         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Products Deleted', life: 3000 });
     }
@@ -156,7 +164,7 @@ function DashboardAmbient() {
         return (
             <React.Fragment>
                 <Button label="Nuevo" icon="pi pi-plus" className="p-button-success mr-2" onClick={openNew} />
-                <Button label="Inactivar" className="p-button-danger" onClick={confirmDeleteSelected} disabled={!selectedAmbient || !selectedAmbient.length} />
+                <Button label="Inactivar" className="p-button-danger" onClick={confirmDisabledSelected} disabled={!selectedAmbient || !selectedAmbient.length} />
             </React.Fragment>
         )
     }
@@ -174,7 +182,7 @@ function DashboardAmbient() {
         return (
             <React.Fragment>
                 <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editProduct(rowData)} />
-                <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDeleteProduct(rowData)} />
+                <Button icon="pi pi-eye-slash" className="p-button-rounded p-button-warning" onClick={() => confirmDisabledAmbient(rowData)} />
             </React.Fragment>
         );
     }
@@ -194,16 +202,16 @@ function DashboardAmbient() {
             <Button label="Guardar" icon="pi pi-check" className="p-button-text" style={{ color: "#5EB319" }} onClick={saveAmbient} />
         </React.Fragment>
     );
-    const deleteProductDialogFooter = (
+    const DisabledAmbientDialogFooter = (
         <React.Fragment>
-            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteProductDialog} />
-            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={deleteProduct} />
+            <Button label="No" icon="pi pi-times" style={{ color: "gray" }} className="p-button-text" onClick={hideDisabledAmbientDialog} />
+            <Button label="Si" icon="pi pi-check" style={{ color: "#5EB319" }} className="p-button-text" onClick={disabledAmbient} />
         </React.Fragment>
     );
     const deleteProductsDialogFooter = (
         <React.Fragment>
-            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteProductsDialog} />
-            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={deleteSelectedProducts} />
+            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDisabledAmbientsDialog} />
+            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={disabledSelectedAmbients} />
         </React.Fragment>
     );
 
@@ -289,14 +297,14 @@ function DashboardAmbient() {
                 </div>
             </Dialog>
 
-            <Dialog visible={deleteAmbientDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductDialogFooter} onHide={hideDeleteProductDialog}>
+            <Dialog visible={disabledAmbientDialog} style={{ width: '450px' }} header="Desactivar Ambiente" modal footer={DisabledAmbientDialogFooter} onHide={hideDisabledAmbientDialog}>
                 <div className="confirmation-content">
                     <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                    {ambient && <span>Are you sure you want to delete <b>{ambient.name}</b>?</span>}
+                    {ambient && <span>¿Estás seguro(a) de desactivar el ambiente <b>{ambient.name}</b>?</span>}
                 </div>
             </Dialog>
 
-            <Dialog visible={deleteAmbientsDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductsDialogFooter} onHide={hideDeleteProductsDialog}>
+            <Dialog visible={disabledAmbientsDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductsDialogFooter} onHide={hideDisabledAmbientsDialog}>
                 <div className="confirmation-content">
                     <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
                     {ambient && <span>Are you sure you want to delete the selected ambients?</span>}

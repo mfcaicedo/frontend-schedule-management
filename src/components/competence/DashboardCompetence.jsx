@@ -25,7 +25,7 @@ function DashboardCompetence() {
     const [competence, setCompetence] = useState([]);
     const [competences, setCompetences] = useState([]);
     const [productDialog, setProductDialog] = useState(false);
-    const [disabledCompetenceDialog, setDeleteProductDialog] = useState(false);
+    const [disabledCompetenceDialog, setDisabledCompetenceDialog] = useState(false);
     const [disabledCompetencesDialog, setDisabledCompetencesDialog] = useState(false);
     const [product, setProduct] = useState([]);
     const [selectedProducts, setSelectedProducts] = useState(null);
@@ -132,7 +132,7 @@ function DashboardCompetence() {
     }
 
     const hideDisabledCompetenceDialog = () => {
-        setDeleteProductDialog(false);
+        setDisabledCompetenceDialog(false);
     }
 
     const hideDeleteProductsDialog = () => {
@@ -195,7 +195,7 @@ function DashboardCompetence() {
 
     const confirmDeleteProduct = (product) => {
         setProduct(product);
-        setDeleteProductDialog(true);
+        setDisabledCompetenceDialog(true);
     }
     /**
      * Metodo para desactivar una competencia de la base de datos
@@ -206,14 +206,14 @@ function DashboardCompetence() {
             .then(response => {
                 if (response.data != null) {
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Competencia desactivada', life: 5000 });
-                    setDeleteProductDialog(false);
+                    setDisabledCompetenceDialog(false);
                     setProduct(emptyCompetence);
                     loadCompetence();
                 }
             });
         // let _products = competences.filter(val => val.id !== product.id);
         // setCompetences(_products);
-        // setDeleteProductDialog(false);
+        // setDisabledCompetenceDialog(false);
         // setProduct(emptyCompetence);
         // toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Competencia desactivda', life: 5000 });
     }
