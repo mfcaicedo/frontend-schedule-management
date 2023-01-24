@@ -156,7 +156,7 @@ function DashboardCompetence() {
         console.log("que paso", competenceSave);
         if (!isEdit) {
             console.log("crear");
-            return 0 ; 
+            // return 0 ; 
             //hago la peticion a la api para guardar el registro
             axios.post("http://localhost:8080/competence", competenceSave)
                 .then(response => {
@@ -297,7 +297,7 @@ function DashboardCompetence() {
         setProduct(_product);
     }
 
-    const onInputChange = (e, name) => {
+    const onInputChange = (e, name) => {    
         const val = (e.target && e.target.value) || '';
         let _product = { ...product };
         _product[`${name}`] = val;

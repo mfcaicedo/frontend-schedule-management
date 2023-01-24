@@ -7,6 +7,7 @@ import DashboardAmbient from "../components/ambient/DashboardAmbient";
 import DashboardAcademicPeriod from "../components/AcademicPeriod/DashboardAcademicPeriod";
 import DashboardProgram from "../components/program/DashboardProgram";
 import '../App.css';
+import Schedule from "../components/schedule/Schedule";
 
 function PublicRouters() {
 
@@ -20,6 +21,8 @@ function PublicRouters() {
                 <Route path="/view-ambient/" element={<DashboardAmbient />} />
                 <Route path="/view-academicperiod/" element={<DashboardAcademicPeriod />} />
                 <Route path="/view-program/" element={<DashboardProgram />} />
+                <Route path="/schedule" element={<Schedule />} />
+
             </Routes>
         </>
     )

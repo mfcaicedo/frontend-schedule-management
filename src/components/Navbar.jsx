@@ -10,13 +10,16 @@ function Navbar() {
         {
             label: 'Inicio',
             icon: 'pi pi-fw pi-home',
+            command: () => {
+                window.location = "/"
+            }
         },
         {
             label: 'Horario',
             icon: 'pi pi-calendar',
             items: [
                 {
-                    label: 'Left',
+                    label: 'Gestión de horarios',
                     icon: 'pi pi-fw pi-align-left',
                     command: () => {
                         window.location = "/schedule"
