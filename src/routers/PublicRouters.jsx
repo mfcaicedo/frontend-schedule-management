@@ -8,6 +8,9 @@ import DashboardAcademicPeriod from "../components/AcademicPeriod/DashboardAcade
 import DashboardProgram from "../components/program/DashboardProgram";
 import '../App.css';
 
+import Account from "../components/login/Account";
+import Auth from "../components/login/Auth";
+
 function PublicRouters() {
 
     return (
@@ -20,6 +23,9 @@ function PublicRouters() {
                 <Route path="/view-ambient/" element={<DashboardAmbient />} />
                 <Route path="/view-academicperiod/" element={<DashboardAcademicPeriod />} />
                 <Route path="/view-program/" element={<DashboardProgram />} />
+                {/* <Route path="/" element={<Auth />} />
+                <Route path="/account" element={<Account />} /> */}
+                
             </Routes>
         </>
     )

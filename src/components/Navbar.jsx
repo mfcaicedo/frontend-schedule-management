@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-
+import { supabase } from './login/supabaseClient';
 import { Menubar } from 'primereact/menubar';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
@@ -74,7 +74,7 @@ function Navbar() {
             end={
                 <>
                     {/* <InputText placeholder="Search" type="text" style={{marginRight:"5px"}} /> */}
-                    <Button label="Cerrar sesión" icon="pi pi-power-off" />
+                    <Button label="Cerrar sesión" icon="pi pi-power-off " onClick={() => supabase.auth.signOut()} />
                 </>
             }
         />
