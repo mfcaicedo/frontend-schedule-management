@@ -24,6 +24,8 @@ function DashboardAmbient() {
     const [submitted, setSubmitted] = useState(false);
     const [globalFilter, setGlobalFilter] = useState(null);
     const [selectType, setSelectType] = useState(null);
+    //Se declara un estado para controlar cuando se edita o se crea una competencia
+    const [isEdit, setIsEdit] = useState(false);
 
     //Referencias 
     const toast = useRef(null);
@@ -39,8 +41,9 @@ function DashboardAmbient() {
                         name: ambient.name,
                         location: ambient.location,
                         typeEnvironment: ambient.typeEnvironment,
+                        typeEnvironment_id: ambient.typeEnvironment === "PRESENCIAL" ? 1 : 0,
                         ability: ambient.ability,
-                        state: ambient.state
+                        state: ambient.state,
                     }
                 })
             )
@@ -58,22 +61,18 @@ function DashboardAmbient() {
 
     const typeOptions = [
         {
-            label: 'Virtual',
-            input: 0
+            label: 'VIRTUAL',
+            value: 0
         },
         {
-            label: 'Presencial',
-            input: 1
+            label: 'PRESENCIAL',
+            value: 1
         }
     ];
 
     useEffect(() => {
         loadAmbient();
-        console.log("producr", ambient)
-
     }, []);
-
-    console.log("ambients", ambient);
 
     const openNew = () => {
         setAmbient(emptyAmbient);
@@ -96,27 +95,69 @@ function DashboardAmbient() {
 
     const saveAmbient = () => {
         setSubmitted(true);
+
         //completo los campos 
         ambient.state = 'Activo';
-        ambient.typeEnvironment = ambient.typeEnvironment.input;
-        delete ambient.id; //elimino el id porque es autoincrementable
-        if (ambient.name.trim()) {
+        //delete ambient.id; //elimino el id porque es autoincrementable
+        console.log("ambient", ambient);
+
+        let ambientSave = {
+            name: ambient.name,
+            location: ambient.location,
+            typeEnvironment: ambient.typeEnvironment_id,
+            ability: ambient.ability,
+            state: ambient.state,
+        }
+        console.log("estado", ambientSave)
+        // return 0;
+
+        if (!isEdit) {
+            // console.log("crear");
             //hago la peticion a la api para guardar el registro
-            axios.post("http://localhost:8080/ambient", ambient)
+            axios.post("http://localhost:8080/ambient", ambientSave)
                 .then(response => {
                     if (response.data != null) {
                         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Ambiente creado', life: 5000 });
                         setAmbientDialog(false);
                         setAmbient(emptyAmbient);
                         loadAmbient();
+                    } else {
+                        toast.current.show({
+                            severity: 'error', summary: 'Error', detail: 'Ocurrió un error, por favor vuelve a intentarlo'
+                            , life: 5000
+                        });
+                        setAmbientDialog(false);
+                        setAmbient(emptyAmbient);
+                    }
+                });
+        } else {
+            console.log(ambient.id)
+            console.log('ambient', ambientSave)
+            //return 0;
+            //hago la peticion a la api para que guarde la competencia editada 
+            axios.patch("http://localhost:8080/ambient/" + ambient.id, ambientSave)
+                .then(response => {
+                    if (response.data != null) {
+                        toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Ambiente actualizada', life: 5000 });
+                        setAmbientDialog(false);
+                        setAmbient(emptyAmbient);
+                        loadAmbient();
+                    } else {
+                        toast.current.show({
+                            severity: 'error', summary: 'Error', detail: 'Ocurrió un error, por favor vuelve a intentarlo'
+                            , life: 5000
+                        });
+                        setAmbientDialog(false);
+                        setAmbient(emptyAmbient);
                     }
                 });
         }
     }
 
-    const editProduct = (ambient) => {
+    const editAmbient = (ambient) => {
         setAmbient({ ...ambient });
         setAmbientDialog(true);
+        setIsEdit(true);
     }
 
     const confirmDisabledAmbient = (ambient) => {
@@ -145,26 +186,37 @@ function DashboardAmbient() {
     }
 
     const disabledSelectedAmbients = () => {
-        let _products = ambients.filter(val => !selectedAmbient.includes(val));
-        setAmbients(_products);
+        let _ambients = ambients.filter(val => !selectedAmbient.includes(val));
+        setAmbients(_ambients);
         setDisabledAmbientsDialog(false);
         setSelectedAmbient(null);
-        toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Products Deleted', life: 3000 });
+        toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Ambientes eliminados', life: 3000 });
     }
 
     const onInputChange = (e, name) => {
         const val = (e.target && e.target.value) || '';
-        let _product = { ...ambient };
-        _product[`${name}`] = val;
+        let _ambient = { ...ambient };
+        _ambient[`${name}`] = val;
 
-        setAmbient(_product);
+        setAmbient(_ambient);
+    }
+
+    const onInputNumberChange = (e, name) => {
+        const val = e.value || 0;
+        let _ambient = { ...ambient };
+        _ambient[`${name}`] = val;
+
+        setAmbient(_ambient);
     }
 
     const leftToolbarTemplate = () => {
         return (
             <React.Fragment>
-                <Button label="Nuevo" icon="pi pi-plus" className="p-button-success mr-2" onClick={openNew} />
-                <Button label="Inactivar" className="p-button-danger" onClick={confirmDisabledSelected} disabled={!selectedAmbient || !selectedAmbient.length} />
+                <Button label="Nuevo Ambiente" icon="pi pi-plus" className="p-button-success mr-2" onClick={(e) => {
+                    openNew()
+                    setIsEdit(false)
+                }} />
+                {/* <Button label="Inactivar" className="p-button-danger" onClick={confirmDisabledSelected} disabled={!selectedAmbient || !selectedAmbient.length} /> */}
             </React.Fragment>
         )
     }
@@ -181,7 +233,7 @@ function DashboardAmbient() {
     const actionBodyTemplate = (rowData) => {
         return (
             <React.Fragment>
-                <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editProduct(rowData)} />
+                <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editAmbient(rowData)} />
                 <Button icon="pi pi-eye-slash" className="p-button-rounded p-button-warning" onClick={() => confirmDisabledAmbient(rowData)} />
             </React.Fragment>
         );
@@ -196,7 +248,7 @@ function DashboardAmbient() {
             </span>
         </div>
     );
-    const productDialogFooter = (
+    const ambientDialogFooter = (
         <React.Fragment>
             <Button label="Cancelar" icon="pi pi-times" className="p-button-text" style={{ color: "gray" }} onClick={hideDialog} />
             <Button label="Guardar" icon="pi pi-check" className="p-button-text" style={{ color: "#5EB319" }} onClick={saveAmbient} />
@@ -208,7 +260,7 @@ function DashboardAmbient() {
             <Button label="Si" icon="pi pi-check" style={{ color: "#5EB319" }} className="p-button-text" onClick={disabledAmbient} />
         </React.Fragment>
     );
-    const deleteProductsDialogFooter = (
+    const deleteAmbientsDialogFooter = (
         <React.Fragment>
             <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDisabledAmbientsDialog} />
             <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={disabledSelectedAmbients} />
@@ -232,6 +284,7 @@ function DashboardAmbient() {
                     <Column field="location" header="Ubicación" ></Column>
                     <Column field="typeEnvironment" header="Tipo de ambiente" ></Column>
                     <Column field="state" header="Estado" ></Column>
+                    <Column field="ability" header="Capacidad" ></Column>
                     {/* //<Column field="state" header="Estado" style={{ minWidth: '8rem' }}></Column> */}
                     <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '8rem' }}></Column>
                 </DataTable>
@@ -239,7 +292,7 @@ function DashboardAmbient() {
 
             <Dialog visible={ambientDialog} style={{ width: '450px' }}
                 header={<img src={logo} alt={"logo"} className="block m-auto pb-0 " />}
-                modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
+                modal className="p-fluid" footer={ambientDialogFooter} onHide={hideDialog}>
                 <div className="title-form" style={{ color: "#5EB319", fontWeight: "bold", fontSize: "22px" }}>
                     <p style={{ marginTop: "0px" }}>
                         Crear Ambiente
@@ -274,17 +327,21 @@ function DashboardAmbient() {
                             borderColor: "#5EB319",
                         }}
                         name="typeEnvironment"
-                        value={selectType}
+                        value={ambient.typeEnvironment_id}
                         options={typeOptions}
                         onChange={(e) => {
                             setSelectType(e.value)
-                            onInputChange(e, "typeEnvironment")
-                            console.log("prueba", e.value)
+                            onInputNumberChange(e, "typeEnvironment")
+                            onInputNumberChange(e, "typeEnvironment_id")
+                            console.log("tipo", ambient.typeEnvironment)
+                            console.log(" id", ambient.typeEnvironment_id)
                         }}
                         optionLabel="label"
                         placeholder="Seleccione tipo"
                     />
                 </div>
+                {console.log("tipo ambient", ambient.typeEnvironment)}
+
                 <div className="field">
                     <label htmlFor="ability">Capacidad</label>
                     <InputText
@@ -304,7 +361,7 @@ function DashboardAmbient() {
                 </div>
             </Dialog>
 
-            <Dialog visible={disabledAmbientsDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductsDialogFooter} onHide={hideDisabledAmbientsDialog}>
+            <Dialog visible={disabledAmbientsDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteAmbientsDialogFooter} onHide={hideDisabledAmbientsDialog}>
                 <div className="confirmation-content">
                     <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
                     {ambient && <span>Are you sure you want to delete the selected ambients?</span>}
