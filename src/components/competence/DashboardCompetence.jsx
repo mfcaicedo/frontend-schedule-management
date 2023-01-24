@@ -354,11 +354,11 @@ function DashboardCompetence() {
                     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} competences"
                     globalFilter={globalFilter} header={header} responsiveLayout="scroll">
                     <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} exportable={false}></Column>
-                    <Column field="id" header="Id" style={{ minWidth: '12rem' }}></Column>
-                    <Column field="name" header="Nombre" sortable style={{ minWidth: '16rem' }}></Column>
+                    <Column field="id" header="Id" style={{ minWidth: '9rem' }}></Column>
+                    <Column field="name" header="Nombre" sortable style={{ minWidth: '12rem' }}></Column>
                     <Column field="type" header="Tipo" ></Column>
                     <Column field="state" header="Estado" style={{ minWidth: '8rem' }}></Column>
-                    <Column field="program" header="Programa" sortable style={{ minWidth: '10rem' }}></Column>
+                    <Column field="program" header="Programa" ></Column>
                     {/* <Column field="rating" header="Reviews" body={ratingBodyTemplate} sortable style={{ minWidth: '12rem' }}></Column> */}
                     {/* <Column field="inventoryStatus" header="Status" body={statusBodyTemplate} sortable style={{ minWidth: '12rem' }}></Column> */}
                     <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '8rem' }}></Column>

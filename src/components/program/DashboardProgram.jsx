@@ -244,7 +244,6 @@ function DashboardProgram() {
         return (
             <React.Fragment>
                 <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editProduct(rowData)} />
-                {/* <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDeleteProduct(rowData)} /> */}
                 <Button label="Competencias asociadas" onClick={() => { showCompetences(loadCompetences(rowData.id)) }} />
             </React.Fragment>
         );
@@ -290,8 +289,8 @@ function DashboardProgram() {
                     currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} programas"
                     globalFilter={globalFilter} header={header} responsiveLayout="scroll">
                     <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} exportable={false}></Column>
-                    <Column field="id" header="Id" style={{ minWidth: '12rem' }}></Column>
-                    <Column field="code" header="Código" style={{ minWidth: '16rem' }}></Column>
+                    <Column field="id" header="Id" style={{ minWidth: '9rem' }}></Column>
+                    <Column field="code" header="Código" sortable style={{ minWidth: '10rem' }}></Column>
                     <Column field="name" header="Nombre" ></Column>
                     <Column field="academicPeriod" header="Periodo Académico" ></Column>
                     <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '8rem' }}></Column>

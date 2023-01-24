@@ -27,8 +27,8 @@ function DashboardAcademicPeriod() {
     //calendario
     const [fechaInicio, setFechaInicio] = useState(null);
     const [fechaFinalizacion, setFechaFinalizacion] = useState(null);
-    const [programs, setPrograms] = useState([]);   
-    const [programsDialog, setProgramsDialog] = useState(false); 
+    const [programs, setPrograms] = useState([]);
+    const [programsDialog, setProgramsDialog] = useState(false);
 
 
     //Referencias 
@@ -41,8 +41,8 @@ function DashboardAcademicPeriod() {
         let baseUrl = "http://localhost:8080/academicPeriod";
         axios.get(baseUrl).then(response =>
             setAcademicPeriods(
-                response.data.map((academicPeriod) =>{
-                    return{
+                response.data.map((academicPeriod) => {
+                    return {
                         id: academicPeriod.id,
                         name: academicPeriod.name,
                         date_init: academicPeriod.date_init,
@@ -56,12 +56,12 @@ function DashboardAcademicPeriod() {
     const loadPrograms = (id) => {
         console.log("id", id)
         //return 0;
-       
-        let baseUrl = "http://localhost:8080/program/programAcademicPeriod/"+id;
+
+        let baseUrl = "http://localhost:8080/program/programAcademicPeriod/" + id;
         axios.get(baseUrl).then(response =>
             setPrograms(
-                response.data.map((program) =>{
-                    return{
+                response.data.map((program) => {
+                    return {
                         id: program.id,
                         code: program.code,
                         name: program.name,
@@ -111,14 +111,14 @@ function DashboardAcademicPeriod() {
         //Fecha inicio
         let fecha = academicPeriod.date_init;
         let dia = fecha.getDate() < 9 ? `0${fecha.getDate()}` : fecha.getDate()
-        let mes = fecha.getMonth()+1 < 9 ? `0${fecha.getMonth()+1}` : fecha.getMonth()+1
+        let mes = fecha.getMonth() + 1 < 9 ? `0${fecha.getMonth() + 1}` : fecha.getMonth() + 1
         let year = fecha.getFullYear()
         let fechaCompletaIni = `${year}-${mes}-${dia}`
         academicPeriod.date_init = fechaCompletaIni
         //Fecha finalizacion
         let fechaFin = academicPeriod.date_end;
         let diaFin = fechaFin.getDate() < 9 ? `0${fechaFin.getDate()}` : fechaFin.getDate()
-        let mesFin = fechaFin.getMonth()+1 < 9 ? `0${fechaFin.getMonth()+1}` : fechaFin.getMonth()+1
+        let mesFin = fechaFin.getMonth() + 1 < 9 ? `0${fechaFin.getMonth() + 1}` : fechaFin.getMonth() + 1
         let yearFin = fechaFin.getFullYear()
         let fechaCompletaFin = `${yearFin}-${mesFin}-${diaFin}`
         academicPeriod.date_end = fechaCompletaFin
@@ -146,13 +146,13 @@ function DashboardAcademicPeriod() {
         setAcademicPeriodDialog(true);
     }
 
-    const showPrograms = (programs) =>{
+    const showPrograms = (programs) => {
         // setPrograms({...programs});
         setProgramsDialog(true);
 
     }
 
-    
+
     const hideProgramDialog = () => {
         setProgramsDialog(false);
     }
@@ -248,7 +248,7 @@ function DashboardAcademicPeriod() {
             <React.Fragment>
                 <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editacademicPeriod(rowData)} />
                 {/* <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDeleteacademicPeriod(rowData)} /> */}
-                <Button label="Programas asociados" onClick={() => {showPrograms(loadPrograms(rowData.id))}}/>
+                <Button label="Programas asociados" onClick={() => { showPrograms(loadPrograms(rowData.id)) }} />
             </React.Fragment>
         );
     }
@@ -264,8 +264,8 @@ function DashboardAcademicPeriod() {
     );
     const academicPeriodDialogFooter = (
         <React.Fragment>
-            <Button label="Cancelar" icon="pi pi-times" className="p-button-text" style= {{color: "gray"}} onClick={hideDialog} />
-            <Button label="Guardar" icon="pi pi-check" className="p-button-text" style= {{color: "#5EB319"}} onClick={saveacademicPeriod} />
+            <Button label="Cancelar" icon="pi pi-times" className="p-button-text" style={{ color: "gray" }} onClick={hideDialog} />
+            <Button label="Guardar" icon="pi pi-check" className="p-button-text" style={{ color: "#5EB319" }} onClick={saveacademicPeriod} />
         </React.Fragment>
     );
     const deleteAcademicPeriodDialogFooter = (
@@ -293,7 +293,7 @@ function DashboardAcademicPeriod() {
                     currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} periodos académicos"
                     globalFilter={globalFilter} header={header} responsiveLayout="scroll">
                     <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} exportable={false}></Column>
-                    <Column field="id" header="Id" style={{ minWidth: '12rem' }}></Column>
+                    <Column field="id" header="Id" style={{ minWidth: '8rem' }}></Column>
                     <Column field="name" header="Nombre" sortable style={{ minWidth: '16rem' }}></Column>
                     <Column field="date_init" header="Fecha de inicio" ></Column>
                     <Column field="date_end" header="Fecha de finalización" style={{ minWidth: '8rem' }}></Column>
@@ -319,23 +319,21 @@ function DashboardAcademicPeriod() {
                         className={classNames({ 'p-invalid': submitted && !academicPeriod.name })} />
                     {submitted && !academicPeriod.name && <small className="p-error">Nombre requerido.</small>}
                 </div>
-                
+
                 <div className="field">
                     <label htmlFor="date_init">Fecha de Inicio</label>
-                    <Calendar id="date_init" value={fechaInicio} onChange={(e) => 
-                        {                    
-                            setFechaInicio(e.value)
-                            onInputChange(e, "date_init")
-                        }} dateFormat="yy-mm-dd" />
+                    <Calendar id="date_init" value={fechaInicio} onChange={(e) => {
+                        setFechaInicio(e.value)
+                        onInputChange(e, "date_init")
+                    }} dateFormat="yy-mm-dd" />
                 </div>
 
                 <div className="field">
                     <label htmlFor="date_end">Fecha de Finalización</label>
-                    <Calendar id="date_end" value={fechaFinalizacion} onChange={(e) => 
-                        {
-                            setFechaFinalizacion(e.value)
-                            onInputChange(e, "date_end")
-                        }} dateFormat="yy-mm-dd" />
+                    <Calendar id="date_end" value={fechaFinalizacion} onChange={(e) => {
+                        setFechaFinalizacion(e.value)
+                        onInputChange(e, "date_end")
+                    }} dateFormat="yy-mm-dd" />
                 </div>
 
             </Dialog>
@@ -361,20 +359,20 @@ function DashboardAcademicPeriod() {
                     <p style={{ marginTop: "0px" }}>
                         Lista de programas asociados
                     </p>
-                </div> 
+                </div>
 
                 <div className="card">
                     <DataTable ref={dt} value={programs} dataKey="id" paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} programas"
-                         responsiveLayout="scroll">                    
+                        responsiveLayout="scroll">
                         <Column field="code" header="Código" sortable style={{ minWidth: '16rem' }}></Column>
                         <Column field="name" header="Nombre" ></Column>
                     </DataTable>
-                </div>                
+                </div>
 
             </Dialog>
-            
+
         </div>
     );
 }

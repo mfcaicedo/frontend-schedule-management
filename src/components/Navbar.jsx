@@ -32,27 +32,9 @@ function Navbar() {
                 {
                     label: 'Competencia',
                     icon: 'pi pi-fw pi-book',
-                    items: [
-                        {
-                            label: 'Crear',
-                            icon: 'pi pi-plus-circle',
-                            command: () => {
-                                window.location = "/competence"
-                            }
-                        },
-                        {
-                            label: 'Ver',
-                            icon: 'pi pi-eye',
-                            command: () => {
-                                window.location = "/view-competence"
-                            }
-                        },
-                    ]
-
-                },
-                {
-                    label: 'Crear',
-                    icon: 'pi pi-fw pi-user-plus',
+                    command: () => {
+                        window.location = "/view-competence"
+                    }
 
                 },
                 {
@@ -63,48 +45,14 @@ function Navbar() {
                     }
 
                 },
-                // {
-                //     label: 'Search',
-                //     icon: 'pi pi-fw pi-users',
-                //     items: [
-                //         {
-                //             label: 'Filter',
-                //             icon: 'pi pi-fw pi-filter',
-                //             items: [
-                //                 {
-                //                     label: 'Print',
-                //                     icon: 'pi pi-fw pi-print'
-                //                 }
-                //             ]
-                //         },
-                //         {
-                //             icon: 'pi pi-fw pi-bars',
-                //             label: 'List'
-                //         }
-                //     ]
-                // }
             ]
         },
         {
             label: 'Ambiente',
             icon: 'pi pi-building',
-            items: [
-                {
-                    label: 'Crear',
-                    icon: 'pi pi-plus-circle',
-                    command: () => {
-                        window.location = "/ambient"
-                    }
-                },
-                {
-                    label: 'Ver',
-                    icon: 'pi pi-eye',
-                    command: () => {
-                        window.location = "/view-ambient"
-                    }
-                },
-            ]
-
+            command: () => {
+                window.location = "/view-ambient"
+            }
         },
         {
             label: 'Periodo académico',

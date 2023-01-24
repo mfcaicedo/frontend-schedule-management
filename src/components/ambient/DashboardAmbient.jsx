@@ -279,8 +279,8 @@ function DashboardAmbient() {
                     currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} ambientes"
                     globalFilter={globalFilter} header={header} responsiveLayout="scroll">
                     <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} exportable={false}></Column>
-                    <Column field="id" header="Id" style={{ minWidth: '12rem' }}></Column>
-                    <Column field="name" header="Nombre" style={{ minWidth: '16rem' }}></Column>
+                    <Column field="id" header="Id" style={{ minWidth: '9rem' }}></Column>
+                    <Column field="name" header="Nombre" sortable style={{ minWidth: '10rem' }}></Column>
                     <Column field="location" header="Ubicación" ></Column>
                     <Column field="typeEnvironment" header="Tipo de ambiente" ></Column>
                     <Column field="state" header="Estado" ></Column>
