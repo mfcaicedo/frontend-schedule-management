@@ -27,8 +27,8 @@ function DashboardAcademicPeriod() {
     //calendario
     const [fechaInicio, setFechaInicio] = useState(null);
     const [fechaFinalizacion, setFechaFinalizacion] = useState(null);
-
-    
+    const [programs, setPrograms] = useState([]);   
+    const [programsDialog, setProgramsDialog] = useState(false); 
 
 
     //Referencias 
@@ -47,6 +47,25 @@ function DashboardAcademicPeriod() {
                         name: academicPeriod.name,
                         date_init: academicPeriod.date_init,
                         date_end: academicPeriod.date_end
+                    }
+                })
+            )
+        );
+    };
+
+    const loadPrograms = (id) => {
+        console.log("id", id)
+        //return 0;
+       
+        let baseUrl = "http://localhost:8080/program/programAcademicPeriod/"+id;
+        axios.get(baseUrl).then(response =>
+            setPrograms(
+                response.data.map((program) =>{
+                    return{
+                        id: program.id,
+                        code: program.code,
+                        name: program.name,
+                        academic_period_id: program.academic_period_id
                     }
                 })
             )
@@ -125,6 +144,17 @@ function DashboardAcademicPeriod() {
     const editacademicPeriod = (academicPeriod) => {
         setAcademicPeriod({ ...academicPeriod });
         setAcademicPeriodDialog(true);
+    }
+
+    const showPrograms = (programs) =>{
+        // setPrograms({...programs});
+        setProgramsDialog(true);
+
+    }
+
+    
+    const hideProgramDialog = () => {
+        setProgramsDialog(false);
     }
 
     const confirmDeleteacademicPeriod = (academicPeriod) => {
@@ -218,7 +248,7 @@ function DashboardAcademicPeriod() {
             <React.Fragment>
                 <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editacademicPeriod(rowData)} />
                 {/* <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDeleteacademicPeriod(rowData)} /> */}
-                <Button label="Programas asociados"/>
+                <Button label="Programas asociados" onClick={() => {showPrograms(loadPrograms(rowData.id))}}/>
             </React.Fragment>
         );
     }
@@ -323,6 +353,28 @@ function DashboardAcademicPeriod() {
                     {academicPeriod && <span>Are you sure you want to delete the selected academicPeriods?</span>}
                 </div>
             </Dialog>
+
+            <Dialog visible={programsDialog} style={{ width: '450px' }}
+                header={<img src={logo} alt={"logo"} className="block m-auto pb-0 " />}
+                modal className="p-fluid" onHide={hideProgramDialog}>
+                <div className="title-form" style={{ color: "#5EB319", fontWeight: "bold", fontSize: "22px" }}>
+                    <p style={{ marginTop: "0px" }}>
+                        Lista de programas asociados
+                    </p>
+                </div> 
+
+                <div className="card">
+                    <DataTable ref={dt} value={programs} dataKey="id" paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
+                        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} programas"
+                         responsiveLayout="scroll">                    
+                        <Column field="code" header="Código" sortable style={{ minWidth: '16rem' }}></Column>
+                        <Column field="name" header="Nombre" ></Column>
+                    </DataTable>
+                </div>                
+
+            </Dialog>
+            
         </div>
     );
 }
