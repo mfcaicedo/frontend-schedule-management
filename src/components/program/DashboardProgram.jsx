@@ -28,8 +28,11 @@ function DashboardProgram() {
     const [selectAcademicPeriod, setSelectAcademicPeriod] = useState(null);
     const [academicPeriod, setAcademicPeriod] = useState([]);
     const [academicPeriodOptions, setAcademicPeriodOptions] = useState(null);
-     //Se declara un estado para controlar cuando se edita o se crea una competencia
-     const [isEdit, setIsEdit] = useState(false);
+    //Se declara un estado para controlar cuando se edita o se crea una competencia
+    const [isEdit, setIsEdit] = useState(false);
+    //cargar las competencias asociadas a un programa
+    const [competences, setCompetences] = useState([]);
+    const [competencesDialog, setCompetencesDialog] = useState(false);
 
     //Referencias 
     const toast = useRef(null);
@@ -45,7 +48,7 @@ function DashboardProgram() {
                         code: program.code,
                         name: program.name,
                         academicPeriod: program.academicPeriod ? program.academicPeriod.name : null,
-                        academic_period_id: program.academicPeriod ? program.academicPeriod.id : null 
+                        academic_period_id: program.academicPeriod ? program.academicPeriod.id : null
                     }
                 })
             )
@@ -70,6 +73,25 @@ function DashboardProgram() {
         )
     }
 
+    const loadCompetences = (id) => {
+        console.log("id", id)
+
+        let baseUrl = "http://localhost:8080/competence/competenceProgram/" + id;
+        axios.get(baseUrl).then(response =>
+            setCompetences(
+                response.data.map((competence) => {
+                    return {
+                        id: competence.id,
+                        name: competence.name,
+                        type: competence.type,
+                        state: competence.state,
+                        program_id: competence.program_id
+                    }
+                })
+            )
+        );
+    };
+
     let emptyProgram = {
         id: null,
         code: '',
@@ -88,6 +110,14 @@ function DashboardProgram() {
         setProgram(emptyProgram);
         setSubmitted(false);
         setProgramDialog(true);
+    }
+
+    const showCompetences = (competences) => {
+        setCompetencesDialog(true);
+    }
+
+    const hideCompetencesDialog = () => {
+        setCompetencesDialog(false);
     }
 
     const hideDialog = () => {
@@ -127,7 +157,7 @@ function DashboardProgram() {
                         setProgramDialog(false);
                         setProgram(emptyProgram);
                         loadAcademicPeriod();
-                    }else{
+                    } else {
                         toast.current.show({
                             severity: 'error', summary: 'Error', detail: 'Ocurrió unerror, por favor vuelve a intentarlo', life: 5000
                         });
@@ -135,27 +165,27 @@ function DashboardProgram() {
                         setProgram(emptyProgram);
                     }
                 });
-        }else{
+        } else {
             console.log(program.id)
             console.log('program', programSave)
             //return 0
             //hago la peticion a la api para que guarde la competencia editada 
             axios.patch("http://localhost:8080/program/" + program.id, programSave)
-            .then(response => {
-                if (response.data != null) {
-                    toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Programa actualizado', life: 5000 });
-                    setProgramDialog(false);
-                    setProgram(emptyProgram);
-                    loadProgram();
-                } else {
-                    toast.current.show({
-                        severity: 'error', summary: 'Error', detail: 'Ocurrió un error, por favor vuelve a intentarlo'
-                        , life: 5000
-                    });
-                    setProgramDialog(false);
-                    setProgram(emptyProgram);
-                }
-            });
+                .then(response => {
+                    if (response.data != null) {
+                        toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Programa actualizado', life: 5000 });
+                        setProgramDialog(false);
+                        setProgram(emptyProgram);
+                        loadProgram();
+                    } else {
+                        toast.current.show({
+                            severity: 'error', summary: 'Error', detail: 'Ocurrió un error, por favor vuelve a intentarlo'
+                            , life: 5000
+                        });
+                        setProgramDialog(false);
+                        setProgram(emptyProgram);
+                    }
+                });
         }
     }
 
@@ -192,7 +222,7 @@ function DashboardProgram() {
     const leftToolbarTemplate = () => {
         return (
             <React.Fragment>
-                <Button label="Nuevo programa" icon="pi pi-plus" className="p-button-success mr-2" onClick={(e) =>{
+                <Button label="Nuevo programa" icon="pi pi-plus" className="p-button-success mr-2" onClick={(e) => {
                     openNew()
                     setIsEdit(false)
                 }} />
@@ -215,7 +245,7 @@ function DashboardProgram() {
             <React.Fragment>
                 <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editProduct(rowData)} />
                 {/* <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDeleteProduct(rowData)} /> */}
-                <Button label="Competencias asociadas" />
+                <Button label="Competencias asociadas" onClick={() => { showCompetences(loadCompetences(rowData.id)) }} />
             </React.Fragment>
         );
     }
@@ -332,6 +362,28 @@ function DashboardProgram() {
                     <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
                     {program && <span>Are you sure you want to delete the selected programs?</span>}
                 </div>
+            </Dialog>
+
+            <Dialog visible={competencesDialog} style={{ width: '550px' }}
+                header={<img src={logo} alt={"logo"} className="block m-auto pb-0 " />}
+                modal className="p-fluid" onHide={hideCompetencesDialog}>
+                <div className="title-form" style={{ color: "#5EB319", fontWeight: "bold", fontSize: "22px" }}>
+                    <p style={{ marginTop: "0px" }}>
+                        Lista de competencias asociados
+                    </p>
+                </div>
+
+                <div className="card">
+                    <DataTable ref={dt} value={competences} dataKey="id" paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
+                        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} programas"
+                        responsiveLayout="scroll">
+                        <Column field="name" header="Nombre" sortable style={{ minWidth: '16rem' }}></Column>
+                        <Column field="type" header="Tipo" ></Column>
+                        <Column field="state" header="Estado" ></Column>
+                    </DataTable>
+                </div>
+
             </Dialog>
         </div>
     );
