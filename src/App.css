@@ -101,3 +101,50 @@
   font-weight: "bold"; 
   font-size: "22px";
 }
+.degradado{
+  /* background: #8aec34; */
+  width: 100vh;
+  height: 100vh;
+  /* background-image: linear-gradient(to bottom right, #2b3f3a, #166b36, #4fb872, rgb(87, 231, 51)); */
+  /* background-image: linear-gradient(to bottom right, #0c4d17, #1bb928, #43c575, rgb(143, 224, 167)); */
+  background-image: linear-gradient(to bottom right,  #b0b39d, #b9bd97,#84d46a, #57c716);
+}
+
+.logo{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  margin-top: 10rem;
+}
+
+/* Formulario login */
+.form-demo .card {
+  min-width: 450px;
+  margin-top: 8rem;
+
+}
+.form-demo .card form {
+  margin-top: 2rem;
+}
+.form-demo .card .field {
+  margin-bottom: 1.5rem;
+}
+@media screen and (max-width: 960px) {
+  .form-demo .card {
+      width: 80%;
+  }
+}
+@media screen and (max-width: 640px) {
+  .form-demo .card {
+      width: 100%;
+      min-width: 0;
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .container{
+    display: grid;
+    grid-template-columns: repeat(2,1fr);
+  }
+}
