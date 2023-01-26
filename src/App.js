@@ -1,41 +1,41 @@
-import './App.css';
-import PublicRouters from './routers/PublicRouters';
+import "./App.css";
+import PublicRouters from "./routers/PublicRouters";
 //import {useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react'
-import { supabase } from './components/login/supabaseClient';
-import Account from './components/login/Account';
-import Auth from './components/login/Auth';
+import { useEffect, useState } from "react";
+import { supabase } from "./components/login/supabaseClient";
+import Account from "./components/login/Account";
+import Auth from "./components/login/Auth";
 import CompetenceForm from "./components/CompetenceForm";
 import DashboardCompetence from "./components/competence/DashboardCompetence";
 import DashboardAmbient from "./components/ambient/DashboardAmbient";
 import DashboardAcademicPeriod from "./components/AcademicPeriod/DashboardAcademicPeriod";
 import DashboardProgram from "./components/program/DashboardProgram";
+import DashboardTeacher from "./components/teacher/DashboardTeacher";
+
 // import { Routes, Route} from "react-router-dom";
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 function App() {
   //const navigate = useNavigate();
-  const [session, setSession] = useState(null)
-
-
+  const [session, setSession] = useState(null);
 
   useEffect(() => {
-    setSession(supabase.auth.getSession())
+    setSession(supabase.auth.getSession());
     supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
-      if (_event == 'SIGNED_OUT') {
+      setSession(session);
+      if (_event == "SIGNED_OUT") {
         window.location.href = "/";
       }
       if (!session) {
         //navigate("/login");
-        console.log("entraaaaaaaaaaaaaaaaaaaaaaa")
+        console.log("entraaaaaaaaaaaaaaaaaaaaaaa");
         //window.location.href="/";
       } else {
-        console.log("elseeeeeeeeeeeeee")
+        console.log("elseeeeeeeeeeeeee");
         window.location.href = "/account";
       }
     });
-  }, [])
+  }, []);
 
   /*
     const getSession = async () =>{
@@ -50,8 +50,6 @@ function App() {
     let sessionPrueba = getSession();
     */
   return (
-
-
     <div className="App">
       <BrowserRouter>
         {/* <PublicRouters /> */}
@@ -61,11 +59,14 @@ function App() {
           <Route path="/competence" element={<CompetenceForm />} />
           <Route path="/view-competence/" element={<DashboardCompetence />} />
           <Route path="/view-ambient/" element={<DashboardAmbient />} />
-          <Route path="/view-academicperiod/" element={<DashboardAcademicPeriod />} />
+          <Route
+            path="/view-academicperiod/"
+            element={<DashboardAcademicPeriod />}
+          />
           <Route path="/view-program/" element={<DashboardProgram />} />
+          <Route path="/view-teacher/" element={<DashboardTeacher />} />
         </Routes>
       </BrowserRouter>
-
     </div>
 
     // <div className="container mx-auto">
