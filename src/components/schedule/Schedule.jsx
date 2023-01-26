@@ -913,7 +913,8 @@ function Schedule() {
         return result !== undefined && result.name !== undefined ? result.name : "";
     }
 
-    return (
+    return ( 
+        //rama de testing
         <div className="container">
             <Toast ref={toast} />
             <div className="title-schedule">
