@@ -1,7 +1,8 @@
 import "../../App.css";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { supabase } from "./supabaseClient";
 import logo from "../../assets/img/logo.png";
+import { Toast } from 'primereact/toast';
 
 //FORMIK
 import { useFormik } from "formik";
@@ -13,6 +14,7 @@ function Auth() {
   //FORMULARIO
   const [showMessage, setShowMessage] = useState(false);
   const [formData, setFormData] = useState({});
+  let toast = useRef(null)
 
   const formik = useFormik({
     initialValues: {
@@ -58,7 +60,8 @@ function Auth() {
       setLoading(true);
       const { error } = await supabase.auth.signInWithOtp({ email });
       if (error) throw error;
-      alert("check your email");
+      // alert("Verifica tu correo");
+      toast.current.show({ severity: 'success', summary: 'Link enviado', detail: 'Verifica tu correo', life: 5000 });
     } catch (error) {
       console.log(error);
       alert(error.error_description || error.message);

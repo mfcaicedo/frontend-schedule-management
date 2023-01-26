@@ -60,21 +60,6 @@ const Account = ({ session }) => {
         );
     };
 
-    const handleLogin = async (e) => {
-        e.preventDefault();
-        try {
-            setLoading(true);
-            const { error } = await supabase.auth.signInWithOtp({ email });
-            if (error) throw error;
-            alert("check your email");
-        } catch (error) {
-            console.log(error);
-            alert(error.error_description || error.message);
-        } finally {
-            setLoading(false);
-        }
-    };
-
     const getProfile = async () => {
         try {
             setLoading(true)
@@ -136,7 +121,7 @@ const Account = ({ session }) => {
     return (
         <div>
             {loading ? (
-                <PublicRouters/>
+                <PublicRouters />
                 // <Navbar render={loading}/>
             ) : (
                 <div className="hero">
