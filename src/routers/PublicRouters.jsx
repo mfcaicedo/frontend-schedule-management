@@ -30,7 +30,7 @@ function PublicRouters() {
         <Route path="/view-teacher/" element={<DashboardTeacher />} />
         {/* <Route path="/" element={<Auth />} />
                 <Route path="/account" element={<Account />} /> */}
-                <Route path="/schedule" element={<Schedule />} />
+        <Route path="/schedule" element={<Schedule />} />
 
       </Routes>
     </>

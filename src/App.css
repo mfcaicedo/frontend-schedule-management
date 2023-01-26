@@ -208,7 +208,7 @@
 }
 
 @media screen and (min-width: 768px) {
-  .container {
+  .container-auth {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
   }
@@ -275,11 +275,11 @@
   text-align: left;
 }
 
-.container {
+.container-auth {
   /* margin: 0 auto; */
   width: 100%;
   max-width: 1200px;
-  padding: 0 20px;
+  /* padding: 0 20px; */
 }
 
 .schedule {
@@ -339,4 +339,7 @@
 .button-reset{
   margin: auto 0 auto 0;
   text-align: left;
+}
+.container{
+  padding: 0 30px;
 }

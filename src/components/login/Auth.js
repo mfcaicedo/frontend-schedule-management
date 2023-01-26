@@ -68,7 +68,7 @@ function Auth() {
   };
 
   return (
-    <div className="container">
+    <div className="container-auth">
       <div className="degradado">
         <div className="logo">
           <img src={logo} alt={"logo"} width="400px" />

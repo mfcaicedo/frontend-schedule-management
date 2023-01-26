@@ -12,6 +12,7 @@ import DashboardAcademicPeriod from "./components/AcademicPeriod/DashboardAcadem
 import DashboardProgram from "./components/program/DashboardProgram";
 import Navbar from "./components/Navbar";
 import DashboardTeacher from "./components/teacher/DashboardTeacher";
+import Schedule from "./components/schedule/Schedule";
 
 // import { Routes, Route} from "react-router-dom";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
@@ -36,8 +37,10 @@ function App() {
         console.log("entraaaaaaaaaaaaaaaaaaaaaaa");
         //window.location.href="/";
       } else {
-        console.log("elseeeeeeeeeeeeee");
-        window.location.href = "/account";
+        if (window.location.href === "http://localhost:3000/") {
+          window.location.href = "/account";
+        }
+        // console.log("verrrr ", window.location.href)
       }
     });
   }, []);
@@ -79,6 +82,7 @@ function App() {
           />
           <Route path="/view-program/" element={<DashboardProgram />} />
           <Route path="/view-teacher/" element={<DashboardTeacher />} />
+          <Route path="/schedule" element={<Schedule />} />
         </Routes>
       </BrowserRouter>
     </div>
