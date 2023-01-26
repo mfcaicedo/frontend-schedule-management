@@ -4,7 +4,9 @@ import { Menubar } from 'primereact/menubar';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 
-function Navbar() {
+function Navbar(loading) {
+
+    const [render, setRender] = useState(null);
 
     const items = [
         {
@@ -67,17 +69,38 @@ function Navbar() {
         }
     ];
 
+    useEffect(() => {
+        {console.log("loading", loading)}
+        if(loading.render === true){
+            setRender(true)
+        }else{
+            setRender(false)
+        }
+        {console.log("carga", render)}
+    }, [loading])
+    
+    
     return (
+        
+        <div aria-live="polite" className='container mx-auto'>
+            
+            {render === true && render !== null ? (
+                <Menubar model={items}
+                // start={<InputText placeholder="Search" type="text" />}
+                    end={
+                    <>
+                        {/* <InputText placeholder="Search" type="text" style={{marginRight:"5px"}} /> */}
+                        <Button label="Cerrar sesión" icon="pi pi-power-off " onClick={() => supabase.auth.signOut()} />
+                    </>
+                    }
+                 />
+            ): (
 
-        <Menubar model={items}
-            // start={<InputText placeholder="Search" type="text" />}
-            end={
-                <>
-                    {/* <InputText placeholder="Search" type="text" style={{marginRight:"5px"}} /> */}
-                    <Button label="Cerrar sesión" icon="pi pi-power-off " onClick={() => supabase.auth.signOut()} />
-                </>
-            }
-        />
+                null
+            )}
+        </div>
+        
+        
 
     )
 }

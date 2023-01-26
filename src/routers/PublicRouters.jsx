@@ -15,7 +15,7 @@ function PublicRouters() {
 
     return (
         <>
-            <Navbar />
+            {/* <Navbar render={true}/> */}
             <Routes>
                 {/* <Route path="/" element={<Navbar />} /> */}
                 <Route path="/competence" element={<CompetenceForm />} />
@@ -25,6 +25,7 @@ function PublicRouters() {
                 <Route path="/view-program/" element={<DashboardProgram />} />
                 {/* <Route path="/" element={<Auth />} />
                 <Route path="/account" element={<Account />} /> */}
+                
                 
             </Routes>
         </>

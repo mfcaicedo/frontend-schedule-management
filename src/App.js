@@ -10,50 +10,57 @@ import DashboardCompetence from "./components/competence/DashboardCompetence";
 import DashboardAmbient from "./components/ambient/DashboardAmbient";
 import DashboardAcademicPeriod from "./components/AcademicPeriod/DashboardAcademicPeriod";
 import DashboardProgram from "./components/program/DashboardProgram";
+import Navbar from "./components/Navbar";
 // import { Routes, Route} from "react-router-dom";
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 function App() {
   //const navigate = useNavigate();
   const [session, setSession] = useState(null)
-
+  const [loading, setLoading] = useState(false)
 
 
   useEffect(() => {
-    setSession(supabase.auth.getSession())
+    getSession()
     supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
-      if (_event == 'SIGNED_OUT') {
+      if (_event === 'SIGNED_OUT') {
         window.location.href = "/";
+
       }
       if (!session) {
-        //navigate("/login");
-        console.log("entraaaaaaaaaaaaaaaaaaaaaaa")
-        //window.location.href="/";
+        window.location.href = "/";
       } else {
-        console.log("elseeeeeeeeeeeeee")
         window.location.href = "/account";
       }
     });
   }, [])
 
-  /*
-    const getSession = async () =>{
-      try{
-        const dataSession = await supabase.auth.getUser()
-        console.log(dataSession.id);
-        return dataSession;
-    }catch(error){
-        alert(error.message)
+
+  const getSession = async () => {
+    try {
+      const { data, error } = await supabase.auth.getSession()
+      if (data.session !== null) {
+        console.log("entra en sesion", data)
+        setSession(data)
+        setLoading(true)
+      } else {
+        setLoading(false)
+      }
+    } catch (error) {
+      alert(error.message)
     }
-    }
-    let sessionPrueba = getSession();
-    */
+  }
+
+
   return (
 
 
     <div className="App">
+      {console.log("es: ", loading)}
       <BrowserRouter>
+
+        <Navbar render={loading} />
+
         {/* <PublicRouters /> */}
         <Routes>
           <Route path="/" element={<Auth />} />
@@ -68,10 +75,7 @@ function App() {
 
     </div>
 
-    // <div className="container mx-auto">
-    //{/* {console.log("veeer",session)} */}
-    // {session == null ? <Auth /> : <Account key={null} session={session} />}
-    // </div>
+
   );
 }
 

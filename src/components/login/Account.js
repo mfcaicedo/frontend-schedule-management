@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { supabase } from "./supabaseClient"
 import Avatar from './Avatar'
 import PublicRouters from "../../routers/PublicRouters"
+import Navbar from "../Navbar"
 //OBTENER VALORES
 const Account = ({ session }) => {
 
@@ -32,7 +33,7 @@ const Account = ({ session }) => {
             if (data === null || data.username === null) {
                 setLoading(false)
             }
-            console.log(loading)
+            // console.log(loading)
             if (data) {
                 setUsername(data.username)
                 setRole(data.role)
@@ -77,9 +78,10 @@ const Account = ({ session }) => {
 
     return (
         <div aria-live="polite" className='container mx-auto'>
-            {console.log("user", username)}
+            {/* {console.log("user", username)} */}
             {loading ? (
-                <PublicRouters />
+                <PublicRouters/>
+                // <Navbar render={loading}/>
             ) : (
                 <form onSubmit={updateProfile} className="form-widget">
                     <Avatar
