@@ -46,6 +46,7 @@
     transform: rotate(0deg);
   }
 
+
   to {
     transform: rotate(360deg);
   }
@@ -59,9 +60,10 @@
   justify-content: space-between;
 }
 
+
 @media screen and (max-width: 960px) {
   .datatable-crud-demo .table-header {
-    align-items: flex-start;
+      align-items: flex-start;
   }
 }
 
@@ -128,6 +130,95 @@
   font-size: "22px";
 }
 
+.degradado {
+  /* background: #8aec34; */
+  width: 100vh;
+  height: 100vh;
+  /* background-image: linear-gradient(to bottom right, #2b3f3a, #166b36, #4fb872, rgb(87, 231, 51)); */
+  /* background-image: linear-gradient(to bottom right, #0c4d17, #1bb928, #43c575, rgb(143, 224, 167)); */
+  background-image: linear-gradient(to bottom right, #b0b39d, #b9bd97, #84d46a, #57c716);
+}
+
+.imagenIngreso {
+  width: 100vh;
+  height: 100vh;
+}
+
+.logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  margin-top: 10rem;
+}
+
+/* Formulario login */
+.form-demo .card {
+  min-width: 450px;
+  margin-top: 8rem;
+
+}
+
+.form-demo .card form {
+  margin-top: 2rem;
+}
+
+.form-demo .card .field {
+  margin-bottom: 1.5rem;
+}
+
+@media screen and (max-width: 960px) {
+  .form-demo .card {
+    width: 80%;
+  }
+}
+
+@media screen and (max-width: 640px) {
+  .form-demo .card {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+.hero {
+  background-image: url(assets/img/sena2.jpg);
+  background-repeat: no-repeat;
+  /* define el tamaño de la imagen tomando todo e espacio disponible */
+  background-size: cover;
+  /* padre debe tener posicion relativa */
+  position: relative;
+  /* width: 100vh; */
+  height: 100vh;
+}
+
+.contenido-hero {
+  /* Hijo tiene posicion relativa */
+  position: absolute;
+  background-color: rgba(0, 0, 0, .7);
+  /* intensidad de la transparencia de la imagen */
+  background-color: rgb(0 0 0 /50%);
+  /* Toma todo el espacio disponible */
+  height: 100%;
+  width: 100%;
+  /* Centar el contenido horizontal y verticalmente */
+  /* display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; */
+}
+
+@media screen and (min-width: 768px) {
+  .container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.button-footer {
+  display: flex;
+  gap: 2rem;
+  justify-content: space-between;
+}
 /* Estilo para los dropdown list de schedule */
 .e-ddl.e-input-group .e-input-group-icon,
 .e-ddl.e-input-group.e-control-wrapper .e-input-group-icon:hover {
