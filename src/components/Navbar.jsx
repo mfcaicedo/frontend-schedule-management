@@ -20,7 +20,7 @@ function Navbar() {
             items: [
                 {
                     label: 'Gestión de horarios',
-                    icon: 'pi pi-fw pi-align-left',
+                    icon: 'pi pi-cog',
                     command: () => {
                         window.location = "/schedule"
                     }
