@@ -71,7 +71,7 @@ function Auth() {
     <div className="container">
       <div className="degradado">
         <div className="logo">
-          <img src={logo} alt={"logo"} />
+          <img src={logo} alt={"logo"} width="400px" />
         </div>
         <p
           className="title-form"

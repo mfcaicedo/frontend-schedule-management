@@ -9,54 +9,67 @@ function Navbar(loading) {
     const [render, setRender] = useState(null);
     const items = [
         {
-            label: "Inicio",
-            icon: "pi pi-fw pi-home",
+            label: 'Inicio',
+            icon: 'pi pi-fw pi-home',
         },
         {
-            label: "Horario",
-            icon: "pi pi-calendar",
+            label: 'Horario',
+            icon: 'pi pi-calendar',
             items: [
                 {
-                    label: "Left",
-                    icon: "pi pi-fw pi-align-left",
+                    label: 'Left',
+                    icon: 'pi pi-fw pi-align-left',
                     command: () => {
-                        window.location = "/schedule";
-                    },
+                        window.location = "/schedule"
+                    }
                 },
             ],
+
         },
         {
-            label: "Programa",
-            icon: "pi pi-pencil",
+            label: 'Programa',
+            icon: 'pi pi-pencil',
             items: [
                 {
-                    label: "Competencia",
-                    icon: "pi pi-fw pi-book",
+                    label: 'Competencia',
+                    icon: 'pi pi-fw pi-book',
                     command: () => {
-                        window.location = "/view-competence";
-                    },
-                },
-                {
-                    label: 'Ambiente',
-                    icon: 'pi pi-building',
-                    command: () => {
-                        window.location = "/view-ambient"
+                        window.location = "/view-competence"
                     }
-                },
-                {
-                    label: 'Periodo académico',
-                    icon: 'pi pi-clock',
-                    command: () => {
-                        window.location = "/view-academicperiod"
-                    }
-                },
-                {
-                    label: 'Docente',
-                    icon: 'pi pi-user'
-                }
 
+                },
+                {
+                    label: 'Ver',
+                    icon: 'pi pi-eye',
+                    command: () => {
+                        window.location = "/view-program"
+                    }
+
+                },
             ]
-        }]
+        },
+        {
+            label: 'Ambiente',
+            icon: 'pi pi-building',
+            command: () => {
+                window.location = "/view-ambient"
+            }
+        },
+        {
+            label: 'Periodo académico',
+            icon: 'pi pi-clock',
+            command: () => {
+                window.location = "/view-academicperiod"
+            }
+        },
+        {
+            label: 'Docente',
+            icon: 'pi pi-user',
+            command: () => {
+                window.location = "/view-teacher"
+            }
+        }
+    ];
 
     useEffect(() => {
         { console.log("loading", loading) }
@@ -71,7 +84,7 @@ function Navbar(loading) {
 
     return (
 
-        <div aria-live="polite" className='container mx-auto'>
+        <div  className=''>
 
             {render === true && render !== null ? (
                 <Menubar model={items}
