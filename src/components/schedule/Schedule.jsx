@@ -32,19 +32,6 @@ L10n.load({
             'deleteEvent': 'Eliminar evento',
             'deleteEventMessage': '¿Está seguro de eliminar este evento?',
             'deleteRecurrenceContent': '¿Desea eliminar solo este evento o toda la serie?',
-            'deleteEventButton': 'Eliminar',
-            'deleteEventCancelButton': 'Cancelar',
-            'deleteEventCancel': 'Cancelar',
-            'deleteMultipleEvent': 'Eliminar eventos',
-
-            'newEvent': 'Evento creado',
-            'newRecurrence': 'Evento recurrencia creado',
-            'editEvent': 'Editar evento',
-            'editRecurrence': 'Editar evento recurrencia',
-            'editEventButton': 'Editar',
-            'editRecurrenceButton': 'Editar',
-            'editEventCancelButton': 'Cancelar',
-
         },
     }
 });
@@ -268,32 +255,6 @@ function Schedule() {
             })
     }
 
-    const data = [
-        {
-            Id: 1,
-            Subject: 'Meeting',
-            StartTime: new Date(2023, 0, 23, 10, 0),
-            EndTime: new Date(2023, 0, 23, 12, 30),
-            IsAllDay: false,
-            Status: 'Completed',
-            Priority: 'High',
-            MeetingType: 'Meeting',
-            Location: '',
-        },
-        {
-            Id: 2,
-            Subject: 'Meeting 2',
-            StartTime: new Date(2023, 0, 23, 10, 0),
-            EndTime: new Date(2023, 0, 23, 12, 30),
-            IsAllDay: false,
-            Status: 'Completed',
-            Priority: 'High',
-            MeetingType: 'Meeting',
-            Location: '',
-            IsDeleted: false,
-            teacher: "hola a todos",
-        },
-    ];
     //json de docentes con los atributos siguientes: id, area, identity_card, lastname,name, status, type_id, type ,type_contract
     let jsonDocentes = {
         "teachers": [
@@ -344,19 +305,14 @@ function Schedule() {
      * @param {*} args data de la celda
      */
     const onPopupOpen = (args) => {
-        console.log("args", args.data.Id);
-
         if (args.type === 'Editor' && !isNullOrUndefined(args.data)) {
-
             //verifico si el evento es nuevo o se esta editando
             if (args.data.day) {
                 isEditEvent = "editar"
                 IdScheduleEdit = args.data.Id
-                console.log("entra al if", args.data.day);
                 setIsEdit(true);
             } else {
                 isEditEvent = "crear"
-                console.log("entra al else", args.data);
                 setIsEdit(false);
             }
 
@@ -366,45 +322,48 @@ function Schedule() {
      * Metodo que se  ejecuta cuando se cierra el modal al agregar un evento
      * @param {*} args data de la celda
      */
-    function onPopupClose(args) {
-        console.log("ver", args);
-        console.log("data", args.data);
-        console.log("type", args.type);
+    const onPopupClose = (args) => {
         if (args.type === 'Editor' && !isNullOrUndefined(args.data)) {
 
-            console.log("llega al onPopupClose", args.data);
+            let errorVerify = false;
 
             //validadaciones de campos
             if (args.data.ambient === null) {
                 toast.current.show({ severity: 'error', summary: 'Error', detail: 'Por favor seleccione un ambiente', life: 5000 });
                 //evito que se cierre el modal
                 args.cancel = true;
+                errorVerify = true;
             }
             if (args.data.teacher === null) {
                 toast.current.show({ severity: 'error', summary: 'Error', detail: 'Por favor seleccione un docente', life: 5000 });
                 //evito que se cierre el modal
                 args.cancel = true;
+                errorVerify = true;
             }
             if (args.data.competence === null) {
                 toast.current.show({ severity: 'error', summary: 'Error', detail: 'Por favor seleccione una competencia', life: 5000 });
                 //evito que se cierre el modal
                 args.cancel = true;
+                errorVerify = true;
             }
             if (args.data.StartTime === null) {
                 toast.current.show({ severity: 'error', summary: 'Error', detail: 'Por favor seleccione una hora de inicio', life: 5000 });
                 //evito que se cierre el modal
                 args.cancel = true;
+                errorVerify = true;
             }
             if (args.data.EndTime === null) {
                 toast.current.show({ severity: 'error', summary: 'Error', detail: 'Por favor seleccione una hora de fin', life: 5000 });
                 //evito que se cierre el modal
                 args.cancel = true;
+                errorVerify = true;
             }
             if (args.data.EndTime.getHours() - args.data.StartTime.getHours() < 2 ||
                 args.data.EndTime.getHours() - args.data.StartTime.getHours() > 4) {
                 toast.current.show({ severity: 'error', summary: 'Error', detail: 'Las franjas horarias deben ser bloques de 2 o 4 horas', life: 5000 });
                 //evito que se cierre el modal
                 args.cancel = true;
+                errorVerify = true;
                 return 0;
             }
             //validar que un profesor no este dos veces en la misma franja horaria
@@ -418,6 +377,7 @@ function Schedule() {
                         toast.current.show({ severity: 'error', summary: 'Error', detail: 'El docente ya tiene una clase en ese horario', life: 5000 });
                         //evito que se cierre el modal
                         args.cancel = true;
+                        errorVerify = true;
                         return 0;
                     }
                     if (args.data.EndTime.getHours() > auxStartTimeSchedule.getHours() &&
@@ -425,6 +385,7 @@ function Schedule() {
                         toast.current.show({ severity: 'error', summary: 'Error', detail: 'El docente ya tiene una clase en ese horario', life: 5000 });
                         //evito que se cierre el modal
                         args.cancel = true;
+                        errorVerify = true;
                         return 0;
                     }
                 }
@@ -440,6 +401,7 @@ function Schedule() {
                         toast.current.show({ severity: 'error', summary: 'Error', detail: 'El ambiente ya tiene una clase en ese horario', life: 5000 });
                         //evito que se cierre el modal
                         args.cancel = true;
+                        errorVerify = true;
                         return 0;
                     }
                     if (args.data.EndTime.getHours() > auxStartTimeSchedule.getHours() &&
@@ -447,6 +409,7 @@ function Schedule() {
                         toast.current.show({ severity: 'error', summary: 'Error', detail: 'El ambiente ya tiene una clase en ese horario', life: 5000 });
                         //evito que se cierre el modal
                         args.cancel = true;
+                        errorVerify = true;
                         return 0;
                     }
                 }
@@ -462,6 +425,7 @@ function Schedule() {
                         toast.current.show({ severity: 'error', summary: 'Error', detail: 'La competencia ya tiene una clase en ese horario', life: 5000 });
                         //evito que se cierre el modal
                         args.cancel = true;
+                        errorVerify = true;
                         return 0;
                     }
                     if (args.data.EndTime.getHours() > auxStartTimeSchedule.getHours() &&
@@ -469,12 +433,219 @@ function Schedule() {
                         toast.current.show({ severity: 'error', summary: 'Error', detail: 'La competencia ya tiene una clase en ese horario', life: 5000 });
                         //evito que se cierre el modal
                         args.cancel = true;
+                        errorVerify = true;
                         return 0;
                     }
                 }
             });
 
             //Si pasa las validaciones se debe enviar la data a la API
+            if (errorVerify == false) {
+                // Busco el ambiente seleccionado en el select de ambientes
+                let ambient = dataAmbients.find(ambient => ambient.id === args.data.ambient)
+                // Busco el docente seleccionado en el select de docentes
+                let teacher = dataTeachers.find(teacher => teacher.id === args.data.teacher)
+                // Busco la competencia seleccionado en el select de competencias
+                let competenceRef = dataCompetences.find(competence => competence.id === args.data.competence)
+                //1. armo el objeto que voy a enviar a la API
+                let dataSendSchedule = {
+                    // "id": 0,
+                    day: args.data.StartTime.getDay(),
+                    duration: args.data.EndTime.getHours() - args.data.StartTime.getHours(),
+                    end_class: args.data.EndTime,
+                    init_class: args.data.StartTime,
+                    ambient: ambient ? ambient : null,
+                    competence: competenceRef ? competenceRef : null,
+                    teacher: teacher ? teacher : null,
+                    program: competenceRef.program.id,
+                }
+                console.log("objectDB", dataSendSchedule)
+
+                if (isEditEvent === "editar") {
+                    //actualizar el evento
+                    //hago la peticion a la API para actualizar la frnaja horaria en la base de datos
+                    axios.patch("http://localhost:8080/schedule/" + IdScheduleEdit, dataSendSchedule)
+                        .then(response => {
+                            if (response.data != null) {
+                                toast.current.show({ severity: 'success', summary: 'Éxito', detail: 'Franja horaria actualizada exitosamente', life: 5000 });
+                            } else {
+                                toast.current.show({
+                                    severity: 'error', summary: 'Error', detail: 'Ocurrió un error, por favor vuelve a intentarlo'
+                                    , life: 5000
+                                });
+                            }
+                        });
+                } else {
+                    //crear un nuevo evento
+                    //hago la peticion a la API para guardar el horario en la base de datos
+                    axios.post("http://localhost:8080/schedule", dataSendSchedule)
+                        .then(response => {
+                            if (response.data != null) {
+                                //si el bloque es de 4 horas reseteo los campos
+                                if (args.data.EndTime.getHours() - args.data.StartTime.getHours() === 4) {
+                                    resetValues();
+                                }
+                                //alerta de exito
+                                toast.current.show({ severity: 'success', summary: 'Éxito', detail: 'Franja horaria guardada exitosamente', life: 5000 });
+                            } else {
+                                toast.current.show({
+                                    severity: 'error', summary: 'Error', detail: 'Ocurrió un error, por favor vuelve a intentarlo'
+                                    , life: 5000
+                                });
+                            }
+                        });
+                }
+            }
+        }
+
+        //eliminar una franja horaria
+        if (args.type === "DeleteAlert" && args.cancel === false) {
+            //eliminar una franja horaria 
+            console.log("eliminar", args.data.Id);
+            axios.delete("http://localhost:8080/schedule/" + args.data.Id)
+                .then(response => {
+                    if (response.data != null) {
+                        toast.current.show({ severity: 'success', summary: 'Éxito', detail: 'Franja horaria eliminada exitosamente', life: 5000 });
+                    } else {
+                        toast.current.show({
+                            severity: 'error', summary: 'Error', detail: 'Ocurrió un error, por favor vuelve a intentarlo'
+                            , life: 5000
+                        });
+                    }
+                });
+        }
+    }
+    /**
+     * Metodo que se ejecuta cuando se arrastra un evento
+     * @param {*} args objeto que contiene la informacion del evento
+     * @returns
+     */
+    const onDrag = (args) => {
+        //selecciono el id del evento a editar
+        IdScheduleEdit = args.data.Id;
+    }
+    /**
+     * Metodo que se ejecuta cuando se termina de arrastrar un evento
+     * @param {*} args objeto que contiene la informacion del evento
+     * @returns 
+     */
+    const onDragStop = (args) => {
+        //guardo en la base de datos la nueva posicion del evento
+        //validadaciones de campos
+        let errorVerify = false;
+        //validadaciones de campos
+        if (args.data.ambient === null) {
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Por favor seleccione un ambiente', life: 5000 });
+            //evito que se cierre el modal
+            args.cancel = true;
+            errorVerify = true;
+        }
+        if (args.data.teacher === null) {
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Por favor seleccione un docente', life: 5000 });
+            //evito que se cierre el modal
+            args.cancel = true;
+            errorVerify = true;
+        }
+        if (args.data.competence === null) {
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Por favor seleccione una competencia', life: 5000 });
+            //evito que se cierre el modal
+            args.cancel = true;
+            errorVerify = true;
+        }
+        if (args.data.StartTime === null) {
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Por favor seleccione una hora de inicio', life: 5000 });
+            //evito que se cierre el modal
+            args.cancel = true;
+            errorVerify = true;
+        }
+        if (args.data.EndTime === null) {
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Por favor seleccione una hora de fin', life: 5000 });
+            //evito que se cierre el modal
+            args.cancel = true;
+            errorVerify = true;
+        }
+        if (args.data.EndTime.getHours() - args.data.StartTime.getHours() < 2 ||
+            args.data.EndTime.getHours() - args.data.StartTime.getHours() > 4) {
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Las franjas horarias deben ser bloques de 2 o 4 horas', life: 5000 });
+            //evito que se cierre el modal
+            args.cancel = true;
+            errorVerify = true;
+            return 0;
+        }
+        //validar que un profesor no este dos veces en la misma franja horaria
+        let teacherSchedule = dataSchedules.filter(schedule => schedule.teacher.id === args.data.teacher)
+        teacherSchedule.forEach(schedule => {
+            let auxStartTimeSchedule = new Date(schedule.init_class);
+            let auxEndTimeSchedule = new Date(schedule.end_class);
+            if (schedule.day == args.data.StartTime.getDay()) {
+                if (args.data.StartTime.getHours() >= auxStartTimeSchedule.getHours() &&
+                    args.data.StartTime.getHours() < auxEndTimeSchedule.getHours()) {
+                    toast.current.show({ severity: 'error', summary: 'Error', detail: 'El docente ya tiene una clase en ese horario', life: 5000 });
+                    //evito que se cierre el modal
+                    args.cancel = true;
+                    errorVerify = true;
+                    return 0;
+                }
+                if (args.data.EndTime.getHours() > auxStartTimeSchedule.getHours() &&
+                    args.data.EndTime.getHours() <= auxEndTimeSchedule.getHours()) {
+                    toast.current.show({ severity: 'error', summary: 'Error', detail: 'El docente ya tiene una clase en ese horario', life: 5000 });
+                    //evito que se cierre el modal
+                    args.cancel = true;
+                    errorVerify = true;
+                    return 0;
+                }
+            }
+        });
+        //validar que un ambiente no este dos veces en la misma franja horaria
+        let ambientSchedule = dataSchedules.filter(schedule => schedule.ambient.id === args.data.ambient)
+        ambientSchedule.forEach(schedule => {
+            let auxStartTimeSchedule = new Date(schedule.init_class);
+            let auxEndTimeSchedule = new Date(schedule.end_class);
+            if (schedule.day == args.data.StartTime.getDay()) {
+                if (args.data.StartTime.getHours() >= auxStartTimeSchedule.getHours() &&
+                    args.data.StartTime.getHours() < auxEndTimeSchedule.getHours()) {
+                    toast.current.show({ severity: 'error', summary: 'Error', detail: 'El ambiente ya tiene una clase en ese horario', life: 5000 });
+                    //evito que se cierre el modal
+                    args.cancel = true;
+                    errorVerify = true;
+                    return 0;
+                }
+                if (args.data.EndTime.getHours() > auxStartTimeSchedule.getHours() &&
+                    args.data.EndTime.getHours() <= auxEndTimeSchedule.getHours()) {
+                    toast.current.show({ severity: 'error', summary: 'Error', detail: 'El ambiente ya tiene una clase en ese horario', life: 5000 });
+                    //evito que se cierre el modal
+                    args.cancel = true;
+                    errorVerify = true;
+                    return 0;
+                }
+            }
+        });
+        //validar que una competencia no este dos veces en la misma franja horaria
+        let competenceSchedule = dataSchedules.filter(schedule => schedule.competence.id === args.data.competence)
+        competenceSchedule.forEach(schedule => {
+            let auxStartTimeSchedule = new Date(schedule.init_class);
+            let auxEndTimeSchedule = new Date(schedule.end_class);
+            if (schedule.day == args.data.StartTime.getDay()) {
+                if (args.data.StartTime.getHours() >= auxStartTimeSchedule.getHours() &&
+                    args.data.StartTime.getHours() < auxEndTimeSchedule.getHours()) {
+                    toast.current.show({ severity: 'error', summary: 'Error', detail: 'La competencia ya tiene una clase en ese horario', life: 5000 });
+                    //evito que se cierre el modal
+                    args.cancel = true;
+                    errorVerify = true;
+                    return 0;
+                }
+                if (args.data.EndTime.getHours() > auxStartTimeSchedule.getHours() &&
+                    args.data.EndTime.getHours() <= auxEndTimeSchedule.getHours()) {
+                    toast.current.show({ severity: 'error', summary: 'Error', detail: 'La competencia ya tiene una clase en ese horario', life: 5000 });
+                    //evito que se cierre el modal
+                    args.cancel = true;
+                    errorVerify = true;
+                    return 0;
+                }
+            }
+        });
+        //Si pasa las validaciones se debe enviar la data a la API
+        if (errorVerify === false) {
             // Busco el ambiente seleccionado en el select de ambientes
             let ambient = dataAmbients.find(ambient => ambient.id === args.data.ambient)
             // Busco el docente seleccionado en el select de docentes
@@ -495,55 +666,13 @@ function Schedule() {
                 program: competenceRef.program.id,
             }
             console.log("objectDB", dataSendSchedule)
-            console.log("idSchedule", IdScheduleEdit);
-            // return 0; 
-            //verifico si es un evento nuevo o se esta editando
-            if (isEditEvent === "editar") {
-                console.log("a editar");
-                //hago la peticion a la API para actualizar la frnaja horaria en la base de datos
-                axios.patch("http://localhost:8080/schedule/" + IdScheduleEdit, dataSendSchedule)
-                    .then(response => {
-                        if (response.data != null) {
-                            toast.current.show({ severity: 'success', summary: 'Éxito', detail: 'Franja horaria actualizada exitosamente', life: 5000 });
-                        } else {
-                            toast.current.show({
-                                severity: 'error', summary: 'Error', detail: 'Ocurrió un error, por favor vuelve a intentarlo'
-                                , life: 5000
-                            });
-                        }
-                    });
-            } else {
-                console.log("a crear");
-                //hago la peticion a la API para guardar el horario en la base de datos
-                axios.post("http://localhost:8080/schedule", dataSendSchedule)
-                    .then(response => {
-                        if (response.data != null) {
-                            //si el bloque es de 4 horas reseteo los campos
-                            if (args.data.EndTime.getHours() - args.data.StartTime.getHours() === 4) {
-                                resetValues();
-                            }
-                            //alerta de exito
-                            toast.current.show({ severity: 'success', summary: 'Éxito', detail: 'Franja horaria guardada exitosamente', life: 5000 });
-                        } else {
-                            toast.current.show({
-                                severity: 'error', summary: 'Error', detail: 'Ocurrió un error, por favor vuelve a intentarlo'
-                                , life: 5000
-                            });
-                        }
-                    });
-            }
-        }
+            console.log("idSchedule", IdScheduleEdit)
 
-        if (args.type === "DeleteAlert" && args.cancel === false) {
-            console.log("eiminar", args);
-            console.log("eiminar", args.data);
-            // return 0;
-            //eliminar una franja horaria 
-            console.log("eliminar", args.data.Id);
-            axios.delete("http://localhost:8080/schedule/" + args.data.Id)
+            //hago la peticion a la API para actualizar la frnaja horaria en la base de datos
+            axios.patch("http://localhost:8080/schedule/" + IdScheduleEdit, dataSendSchedule)
                 .then(response => {
                     if (response.data != null) {
-                        toast.current.show({ severity: 'success', summary: 'Éxito', detail: 'Franja horaria eliminada exitosamente', life: 5000 });
+                        toast.current.show({ severity: 'success', summary: 'Éxito', detail: 'Franja horaria actualizada exitosamente', life: 5000 });
                     } else {
                         toast.current.show({
                             severity: 'error', summary: 'Error', detail: 'Ocurrió un error, por favor vuelve a intentarlo'
@@ -552,179 +681,10 @@ function Schedule() {
                     }
                 });
         }
-    }
-    function onDrag(args) {
-        console.log("drag", args);
-        IdScheduleEdit = args.data.Id;
-    }
-    function onDragStop(args) {
-        console.log("drag stop", args);
-        //guardo en la base de datos la nueva posicion del evento
-
-        //validadaciones de campos
-        if (args.data.ambient === null) {
-            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Por favor seleccione un ambiente', life: 5000 });
-            //evito que se cierre el modal
-            args.cancel = true;
-        }
-        if (args.data.teacher === null) {
-            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Por favor seleccione un docente', life: 5000 });
-            //evito que se cierre el modal
-            args.cancel = true;
-        }
-        if (args.data.competence === null) {
-            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Por favor seleccione una competencia', life: 5000 });
-            //evito que se cierre el modal
-            args.cancel = true;
-        }
-        if (args.data.StartTime === null) {
-            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Por favor seleccione una hora de inicio', life: 5000 });
-            //evito que se cierre el modal
-            args.cancel = true;
-        }
-        if (args.data.EndTime === null) {
-            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Por favor seleccione una hora de fin', life: 5000 });
-            //evito que se cierre el modal
-            args.cancel = true;
-        }
-        if (args.data.EndTime.getHours() - args.data.StartTime.getHours() < 2 ||
-            args.data.EndTime.getHours() - args.data.StartTime.getHours() > 4) {
-            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Las franjas horarias deben ser bloques de 2 o 4 horas', life: 5000 });
-            //evito que se cierre el modal
-            args.cancel = true;
-            return 0;
-        }
-        //validar que un profesor no este dos veces en la misma franja horaria
-        let teacherSchedule = dataSchedules.filter(schedule => schedule.teacher.id === args.data.teacher)
-        teacherSchedule.forEach(schedule => {
-            let auxStartTimeSchedule = new Date(schedule.init_class);
-            let auxEndTimeSchedule = new Date(schedule.end_class);
-            if (schedule.day == args.data.StartTime.getDay()) {
-                if (args.data.StartTime.getHours() >= auxStartTimeSchedule.getHours() &&
-                    args.data.StartTime.getHours() < auxEndTimeSchedule.getHours()) {
-                    toast.current.show({ severity: 'error', summary: 'Error', detail: 'El docente ya tiene una clase en ese horario', life: 5000 });
-                    //evito que se cierre el modal
-                    args.cancel = true;
-                    return 0;
-                }
-                if (args.data.EndTime.getHours() > auxStartTimeSchedule.getHours() &&
-                    args.data.EndTime.getHours() <= auxEndTimeSchedule.getHours()) {
-                    toast.current.show({ severity: 'error', summary: 'Error', detail: 'El docente ya tiene una clase en ese horario', life: 5000 });
-                    //evito que se cierre el modal
-                    args.cancel = true;
-                    return 0;
-                }
-            }
-        });
-        //validar que un ambiente no este dos veces en la misma franja horaria
-        let ambientSchedule = dataSchedules.filter(schedule => schedule.ambient.id === args.data.ambient)
-        ambientSchedule.forEach(schedule => {
-            let auxStartTimeSchedule = new Date(schedule.init_class);
-            let auxEndTimeSchedule = new Date(schedule.end_class);
-            if (schedule.day == args.data.StartTime.getDay()) {
-                if (args.data.StartTime.getHours() >= auxStartTimeSchedule.getHours() &&
-                    args.data.StartTime.getHours() < auxEndTimeSchedule.getHours()) {
-                    toast.current.show({ severity: 'error', summary: 'Error', detail: 'El ambiente ya tiene una clase en ese horario', life: 5000 });
-                    //evito que se cierre el modal
-                    args.cancel = true;
-                    return 0;
-                }
-                if (args.data.EndTime.getHours() > auxStartTimeSchedule.getHours() &&
-                    args.data.EndTime.getHours() <= auxEndTimeSchedule.getHours()) {
-                    toast.current.show({ severity: 'error', summary: 'Error', detail: 'El ambiente ya tiene una clase en ese horario', life: 5000 });
-                    //evito que se cierre el modal
-                    args.cancel = true;
-                    return 0;
-                }
-            }
-        });
-        //validar que una competencia no este dos veces en la misma franja horaria
-        let competenceSchedule = dataSchedules.filter(schedule => schedule.competence.id === args.data.competence)
-        competenceSchedule.forEach(schedule => {
-            let auxStartTimeSchedule = new Date(schedule.init_class);
-            let auxEndTimeSchedule = new Date(schedule.end_class);
-            if (schedule.day == args.data.StartTime.getDay()) {
-                if (args.data.StartTime.getHours() >= auxStartTimeSchedule.getHours() &&
-                    args.data.StartTime.getHours() < auxEndTimeSchedule.getHours()) {
-                    toast.current.show({ severity: 'error', summary: 'Error', detail: 'La competencia ya tiene una clase en ese horario', life: 5000 });
-                    //evito que se cierre el modal
-                    args.cancel = true;
-                    return 0;
-                }
-                if (args.data.EndTime.getHours() > auxStartTimeSchedule.getHours() &&
-                    args.data.EndTime.getHours() <= auxEndTimeSchedule.getHours()) {
-                    toast.current.show({ severity: 'error', summary: 'Error', detail: 'La competencia ya tiene una clase en ese horario', life: 5000 });
-                    //evito que se cierre el modal
-                    args.cancel = true;
-                    return 0;
-                }
-            }
-        });
-
-        //Si pasa las validaciones se debe enviar la data a la API
-        // Busco el ambiente seleccionado en el select de ambientes
-        let ambient = dataAmbients.find(ambient => ambient.id === args.data.ambient)
-        // Busco el docente seleccionado en el select de docentes
-        let teacher = dataTeachers.find(teacher => teacher.id === args.data.teacher)
-        // Busco la competencia seleccionado en el select de competencias
-        let competenceRef = dataCompetences.find(competence => competence.id === args.data.competence)
-        //1. armo el objeto que voy a enviar a la API
-        console.log("program ver", competenceRef.program.id)
-        let dataSendSchedule = {
-            // "id": 0,
-            day: args.data.StartTime.getDay(),
-            duration: args.data.EndTime.getHours() - args.data.StartTime.getHours(),
-            end_class: args.data.EndTime,
-            init_class: args.data.StartTime,
-            ambient: ambient ? ambient : null,
-            competence: competenceRef ? competenceRef : null,
-            teacher: teacher ? teacher : null,
-            program: competenceRef.program.id,
-        }
-        console.log("objectDB", dataSendSchedule)
-        console.log("idSchedule", IdScheduleEdit)
-
-        // return 0; 
-
-        //hago la peticion a la API para actualizar la frnaja horaria en la base de datos
-        axios.patch("http://localhost:8080/schedule/" + IdScheduleEdit, dataSendSchedule)
-            .then(response => {
-                if (response.data != null) {
-                    toast.current.show({ severity: 'success', summary: 'Éxito', detail: 'Franja horaria actualizada exitosamente', life: 5000 });
-                } else {
-                    toast.current.show({
-                        severity: 'error', summary: 'Error', detail: 'Ocurrió un error, por favor vuelve a intentarlo'
-                        , life: 5000
-                    });
-                }
-            });
 
     }
-    const onDeleteEvent = (args) => {
-        console.log("eliminar nuevo", args);
-    }
-    const onActionComplete = (args) => {
-        console.log("complete", args);
-    }
-    const onEventRendered = (args) => {
-        console.log("render", args);
-    }
-    const onActionFailure = (args) => {
-        console.log("failure", args);
-    }
-    //useEffect que hace referencia al ciclo de vida del componente (inicio, actualizacion, fin)
-    useEffect(() => {
-        loadAmbients()
-        loadCompetences()
-        loadTeachers()
-        loadAcademicPeriod()
-        loadSchedules()
-        loadAllPrograms()
-    }, [])
 
-    console.log("schedules: ", dataSchedules);
-
-    //Template para el renderizado del formulario
+    //Template para el renderizado del formulario que se muestra al hacer click en una franja horaria
     function editorTemplate(props) {
         return (
             props !== undefined ? <table className="custom-event-editor" style={{ width: '100%', cellpadding: '5' }}>
@@ -876,13 +836,6 @@ function Schedule() {
             ambient: 0,
         })
     }
-    const onDestroyed = (dialogInstance) => {
-        resetValues();
-        //elimino el evento de la ventana
-        dialogInstance.destroy();
-
-
-    }
     //Handle change para que me actualizar el valor seleccionado en los campos
     const onHandleChange = (e) => {
         setValues({
@@ -913,6 +866,16 @@ function Schedule() {
         return result !== undefined && result.name !== undefined ? result.name : "";
     }
 
+    //useEffect que hace referencia al ciclo de vida del componente (inicio, actualizacion, fin)
+    useEffect(() => {
+        loadAmbients()
+        loadCompetences()
+        loadTeachers()
+        loadAcademicPeriod()
+        loadSchedules()
+        loadAllPrograms()
+    }, [])
+
     return (
         <div className="container">
             <Toast ref={toast} />
@@ -937,13 +900,11 @@ function Schedule() {
                                 onChange={(e) => {
                                     onHandleChange(e)
                                     //llamar al metodo que carga los programas academicos
-                                    console.log("ver el e ", e.target.value)
                                     loadPrograms(e.target.value)
                                 }}
                             >
                             </DropDownListComponent>
                         </div>
-                        {console.log("funcione ", optionsAuxProgram)}
                     </div>
                     <div className="field-program-academic">
                         <p>
@@ -959,7 +920,6 @@ function Schedule() {
                                 onChange={(e) => {
                                     onHandleChange(e)
                                     //llamar al metodo que carga las competencias
-                                    console.log("ver el id programa", e.target.value)
                                     loadCompetencesToProgram(e.target.value)
                                 }}
                             >
@@ -1063,21 +1023,15 @@ function Schedule() {
                         />
                     </div>
                 </div>
-                {console.log("values", values)}
             </div>
             <div className="schedule" >
                 <div className="schedule-header">
                     <h3>Agenda horaria</h3>
                     <ScheduleComponent
-                        // selectedDate={new Date(2023, 0, 1)}
                         ref={schedule => scheduleObj = schedule}
                         eventSettings={{ dataSource: dataSchedulesFormat }}
                         popupOpen={onPopupOpen}
                         popupClose={onPopupClose}
-                        deleteEvent={onDeleteEvent}
-                        destroyed={onDestroyed}
-                        //evento que se ejecuta cuando le doy cancel en el popup
-
                         drag={onDrag}
                         dragStop={onDragStop}
                         showQuickInfo={false}
@@ -1087,8 +1041,6 @@ function Schedule() {
                         workHours={{ highlight: true, start: '07:00', end: '20:00' }}
                         timeScale={{ enable: true, interval: 60, slotCount: 1 }}
                         weekRule="FirstFullWeek"
-                        // weekRule="firstDay"
-                        // weekRule="FirstFourDayWeek"
                         workDays={[1, 2, 3, 4, 5, 6]}
                         showWeekend={false}
                         startHour="07:00"
@@ -1096,17 +1048,9 @@ function Schedule() {
                         // showHeaderBar={false} oculta el header
                         // readonly={true} // solo lectura 
                         minDate={new Date(2023, 0, 1)}
-                    // maxDate={new Date(2023, 11, 31)}
-                    // locale="es-ES"
+                        // maxDate={new Date(2023, 11, 31)}
                     >
                         <ViewsDirective>
-                            <HeaderRowsDirective>
-                                <HeaderRowDirective option="Year" />
-                                <HeaderRowDirective option="Month" />
-                                <HeaderRowDirective option="Week" />
-                                <HeaderRowDirective option="Date" />
-                                <HeaderRowDirective option="Hour" />
-                            </HeaderRowsDirective>
                             <ViewDirective option='Day' />
                             <ViewDirective option='WorkWeek' />
                             <ViewDirective option='Week' />
@@ -1117,10 +1061,8 @@ function Schedule() {
                         />
                     </ScheduleComponent>
                 </div>
-
             </div>
         </div>
-
     )
 }
 export default Schedule;

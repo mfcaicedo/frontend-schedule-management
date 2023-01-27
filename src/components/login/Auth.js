@@ -72,6 +72,7 @@ function Auth() {
 
   return (
     <div className="container-auth">
+      <Toast ref={toast} />
       <div className="degradado">
         <div className="logo">
           <img src={logo} alt={"logo"} width="400px" />

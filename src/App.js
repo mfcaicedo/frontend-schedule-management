@@ -22,7 +22,7 @@ function App() {
   const [session, setSession] = useState(null)
   const [loading, setLoading] = useState(false)
 
-  
+
 
   useEffect(() => {
     getSession()
@@ -37,10 +37,13 @@ function App() {
         console.log("entraaaaaaaaaaaaaaaaaaaaaaa");
         //window.location.href="/";
       } else {
+        // window.location.reload();
+        console.log("wwindowwwwwwww ", window.location.href)
         if (window.location.href === "http://localhost:3000/") {
           window.location.href = "/account";
         }
         // console.log("verrrr ", window.location.href)
+        // window.location.href = "/account";
       }
     });
   }, []);
